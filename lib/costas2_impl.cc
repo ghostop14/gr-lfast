@@ -173,7 +173,9 @@ namespace gr {
         	// gnuradio lookup functions - expensive with float_to_fixed in each iteration
         	// Tried rolling our own lookup tables - Same performance as straight trig
         	// Tried quadratic curve inline approximation - Tiny bit faster
-       	 gr::sincosf(-d_phase, &n_i, &n_r);
+       	 //gr::sincosf(-d_phase, &n_i, &n_r);
+          n_i = sinf(-d_phase);
+          n_r = cosf(-d_phase);
 
           //optr[i] = iptr[i] * nco_out;
           i_r = iptr[i].real();
@@ -238,7 +240,9 @@ namespace gr {
         	// gnuradio lookup functions - expensive with float_to_fixed in each iteration
         	// Tried rolling our own lookup tables - Same performance as straight trig
         	// Tried quadratic curve inline approximation - Tiny bit faster
-       	 gr::sincosf(-d_phase, &n_i, &n_r);
+       	 // gr::sincosf(-d_phase, &n_i, &n_r);
+			n_i = sinf(-d_phase);
+			n_r = cosf(-d_phase);
 
           //optr[i] = iptr[i] * nco_out;
           i_r = iptr[i].real();
