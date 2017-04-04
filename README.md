@@ -6,9 +6,13 @@ block throughput to 37 MSPS (about a 54% speed improvement).  More blocks will b
 
 
 After building, in the build directory's lib subdirectory will be a file called test-lfast that will display metrics for before and after tuning on your system.  The following shows the throughput on an i7-6700 CPU @ 3.40GHz:
+
 Testing Costas Loop with 8192 samples...
+
 Original Code Run Time:      0.000340 s  (24093070.000000 sps)
+
 LFAST Code Run Time:      0.000220 s  (37235916.000000 sps)
+
 Speedup:         54.55% faster
 
 
