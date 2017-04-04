@@ -1,0 +1,21 @@
+<block>
+  <name>Accelerated Costas 2nd Order Loop</name>
+  <key>lfast_costas2</key>
+  <category>[LFAST Accelerated Blocks]</category>
+  <import>import lfast</import>
+  <make>lfast.costas2($w, 2)</make>
+  <callback>set_loop_bandwidth($w)</callback>
+  <param>
+    <name>Loop Bandwidth</name>
+    <key>w</key>
+    <type>real</type>
+  </param>
+  <sink>
+    <name>in</name>
+    <type>complex</type>
+  </sink>
+  <source>
+    <name>out</name>
+    <type>complex</type>
+  </source>
+</block>
