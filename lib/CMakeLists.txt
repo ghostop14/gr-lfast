@@ -27,6 +27,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 list(APPEND lfast_sources
     costas2_impl.cc
+    agc_fast_impl.cc
 )
 
 set(lfast_sources "${lfast_sources}" PARENT_SCOPE)
@@ -36,7 +37,7 @@ if(NOT lfast_sources)
 endif(NOT lfast_sources)
 
 add_library(gnuradio-lfast SHARED ${lfast_sources})
-target_link_libraries(gnuradio-lfast ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES} gnuradio-blocks
+target_link_libraries(gnuradio-lfast ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES} gnuradio-blocks volk
 )
 set_target_properties(gnuradio-lfast PROPERTIES DEFINE_SYMBOL "gnuradio_lfast_EXPORTS")
 
@@ -62,8 +63,10 @@ include_directories(${CPPUNIT_INCLUDE_DIRS})
 list(APPEND test_lfast_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/test_lfast.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/qa_lfast.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/qa_agc_fast.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/qa_costas2.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/costas2_impl.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/agc_fast_impl.cc
 )
 
 add_executable(test-lfast ${test_lfast_sources})
@@ -73,7 +76,8 @@ target_link_libraries(
   ${GNURADIO_RUNTIME_LIBRARIES}
   ${Boost_LIBRARIES}
   ${CPPUNIT_LIBRARIES}
-  /usr/lib/x86_64-linux-gnu/libgnuradio-blocks.so
+  gnuradio-blocks
+  volk
   gnuradio-lfast
 )
 

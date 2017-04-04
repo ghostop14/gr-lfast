@@ -22,5 +22,6 @@
 ########################################################################
 install(FILES
     api.h
-    costas2.h DESTINATION include/lfast
+    costas2.h
+    agc_fast.h DESTINATION include/lfast
 )

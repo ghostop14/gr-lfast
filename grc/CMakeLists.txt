@@ -18,5 +18,6 @@
 # Boston, MA 02110-1301, USA.
 
 install(FILES
-    lfast_costas2.xml DESTINATION share/gnuradio/grc/blocks
+    lfast_costas2.xml
+    lfast_agc_fast.xml DESTINATION share/gnuradio/grc/blocks
 )
