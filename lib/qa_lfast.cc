@@ -28,6 +28,7 @@
 #include "qa_lfast.h"
 #include "qa_costas2.h"
 #include "qa_agc_fast.h"
+#include "qa_CC2F2ByteVector.h"
 
 CppUnit::TestSuite *
 qa_lfast::suite()
@@ -35,6 +36,7 @@ qa_lfast::suite()
   CppUnit::TestSuite *s = new CppUnit::TestSuite("lfast");
   s->addTest(gr::lfast::qa_costas2::suite());
   s->addTest(gr::lfast::qa_agc_fast::suite());
+  s->addTest(gr::lfast::qa_CC2F2ByteVector::suite());
 
   return s;
 }

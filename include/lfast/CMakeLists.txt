@@ -23,5 +23,6 @@
 install(FILES
     api.h
     costas2.h
-    agc_fast.h DESTINATION include/lfast
+    agc_fast.h
+    CC2F2ByteVector.h DESTINATION include/lfast
 )

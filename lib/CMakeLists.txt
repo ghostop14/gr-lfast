@@ -28,6 +28,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 list(APPEND lfast_sources
     costas2_impl.cc
     agc_fast_impl.cc
+    CC2F2ByteVector_impl.cc
 )
 
 set(lfast_sources "${lfast_sources}" PARENT_SCOPE)
@@ -63,10 +64,12 @@ include_directories(${CPPUNIT_INCLUDE_DIRS})
 list(APPEND test_lfast_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/test_lfast.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/qa_lfast.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/qa_CC2F2ByteVector.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/qa_agc_fast.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/qa_costas2.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/costas2_impl.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/agc_fast_impl.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/CC2F2ByteVector_impl.cc
 )
 
 add_executable(test-lfast ${test_lfast_sources})
