@@ -1,5 +1,5 @@
 <block>
-  <name>Accelerated Complex2Real2Byte2Vector</name>
+  <name>Accel Complex2Real2Byte2Vector</name>
   <key>lfast_CC2F2ByteVector</key>
   <category>[LFAST Accelerated Blocks]</category>
   <import>import lfast</import>

@@ -50,6 +50,8 @@ namespace gr {
        * creating new instances.
        */
       static sptr make(float loop_bw, int order);
+
+      virtual float error() const = 0;
     };
 
   } // namespace lfast

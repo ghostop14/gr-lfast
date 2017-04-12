@@ -49,7 +49,7 @@ namespace gr {
               gr::io_signature::make(1, 1, sizeof(gr_complex)),
               gr::io_signature::make(1, 1, sizeof(gr_complex))),
 			  blocks::control_loop(loop_bw, 1.0, -1.0),
-			  d_order(order), d_error(0), d_noise(1.0)
+			  d_order(order), d_error(0), d_noise(1.0), d_phase_detector(NULL)
     {
     	// Only set up for 2nd order right now.
         d_phase_detector = &costas2_impl::phase_detector_2;
@@ -233,6 +233,8 @@ namespace gr {
         int i;
         float angle_rad,sin,cos;
 
+        // gr_complex nco_out;
+
         for(i = 0; i < noutput_items; i++) {
           // nco_out = gr_expj(-d_phase);
       	  // returns this:  nco_out.real = n_r, nco_out.imag = n_i
@@ -282,9 +284,23 @@ namespace gr {
             d_freq = d_max_freq;
           else if(d_freq < d_min_freq)
             d_freq = d_min_freq;
+
+        /*
+         * original code
+		nco_out = gr_expj(-d_phase);
+		optr[i] = iptr[i] * nco_out;
+
+		d_error = (*this.*d_phase_detector)(optr[i]);
+		d_error = gr::branchless_clip(d_error, 1.0);
+
+		advance_loop(d_error);
+		phase_wrap();
+		frequency_limit();
+         */
+
         }
 
-        consume_each (noutput_items);
+        // consume_each (noutput_items);
 
         return noutput_items;
     }
@@ -294,30 +310,12 @@ namespace gr {
     {
 #ifdef GR_CTRLPORT
       // Getters
-      add_rpc_variable(
-          rpcbasic_sptr(new rpcbasic_register_get<costas2, float>(
+        rpcbasic_sptr(new rpcbasic_register_get<costas2_cc, float>(
 	      alias(), "error",
 	      &costas_loop_cc::error,
 	      pmt::mp(-2.0f), pmt::mp(2.0f), pmt::mp(0.0f),
 	      "", "Error signal of loop", RPC_PRIVLVL_MIN,
-              DISPTIME | DISPOPTSTRIP)));
-
-      add_rpc_variable(
-          rpcbasic_sptr(new rpcbasic_register_get<control_loop, float>(
-	      alias(), "frequency",
-	      &control_loop::get_frequency,
-	      pmt::mp(0.0f), pmt::mp(2.0f), pmt::mp(0.0f),
-	      "", "Frequency Est.", RPC_PRIVLVL_MIN,
-              DISPTIME | DISPOPTSTRIP)));
-
-      add_rpc_variable(
-          rpcbasic_sptr(new rpcbasic_register_get<control_loop, float>(
-	      alias(), "phase",
-	      &control_loop::get_phase,
-	      pmt::mp(0.0f), pmt::mp(2.0f), pmt::mp(0.0f),
-	      "", "Phase Est.", RPC_PRIVLVL_MIN,
-              DISPTIME | DISPOPTSTRIP)));
-
+            DISPTIME | DISPOPTSTRIP)));
       add_rpc_variable(
           rpcbasic_sptr(new rpcbasic_register_get<control_loop, float>(
 	      alias(), "loop_bw",

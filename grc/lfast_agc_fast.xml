@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <block>
-  <name>Accelerated AGC</name>
+  <name>Accel AGC</name>
   <key>lfast_agc_fast</key>
   <category>[LFAST Accelerated Blocks]</category>
   <import>import lfast</import>

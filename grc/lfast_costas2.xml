@@ -1,5 +1,5 @@
 <block>
-  <name>Accelerated Costas 2nd Order Loop</name>
+  <name>Accel Costas 2nd Order Loop</name>
   <key>lfast_costas2</key>
   <category>[LFAST Accelerated Blocks]</category>
   <import>import lfast</import>
