@@ -44,7 +44,7 @@ namespace gr {
       : gr::sync_decimator("CC2F2ByteVector",
               gr::io_signature::make(1, 1, sizeof(gr_complex)*vecLength),
               gr::io_signature::make(1, 1, sizeof(char)*vecLength*numVecItems),
-			  vecLength),d_scale(scale),d_vlen(vecLength)
+			  numVecItems),d_scale(scale),d_vlen(vecLength)
     {
         const int alignment_multiple =
   	volk_get_alignment() / sizeof(float);
