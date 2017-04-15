@@ -22,5 +22,5 @@ install(FILES
     lfast_agc_fast.xml
     lfast_agc_fast_ff.xml
     lfast_CC2F2ByteVector.xml
-    lfast_net_sink.xml DESTINATION share/gnuradio/grc/blocks
+    DESTINATION share/gnuradio/grc/blocks
 )
