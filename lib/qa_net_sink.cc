@@ -19,28 +19,20 @@
  */
 
 
-#ifndef _QA_AGC_FAST_H_
-#define _QA_AGC_FAST_H_
-
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/TestCase.h>
+#include <gnuradio/attributes.h>
+#include <cppunit/TestAssert.h>
+#include "qa_net_sink.h"
+#include <lfast/net_sink.h>
 
 namespace gr {
   namespace lfast {
 
-    class qa_agc_fast : public CppUnit::TestCase
+    void
+    qa_net_sink::t1()
     {
-    public:
-      CPPUNIT_TEST_SUITE(qa_agc_fast);
-      CPPUNIT_TEST(t1);
-      CPPUNIT_TEST_SUITE_END();
-
-    private:
-      void t1();
-    };
+      // Put test here
+    }
 
   } /* namespace lfast */
 } /* namespace gr */
-
-#endif /* _QA_AGC_FAST_H_ */
 

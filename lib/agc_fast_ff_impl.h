@@ -18,33 +18,34 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef INCLUDED_LFAST_AGC_FAST_IMPL_H
-#define INCLUDED_LFAST_AGC_FAST_IMPL_H
+#ifndef INCLUDED_LFAST_AGC_FAST_FF_IMPL_H
+#define INCLUDED_LFAST_AGC_FAST_FF_IMPL_H
 
-#include <lfast/agc_fast.h>
+#include <lfast/agc_fast_ff.h>
+#include <gnuradio/analog/agc.h>
 
 namespace gr {
   namespace lfast {
 
-    class agc_fast_impl : public agc_fast,kernel::agc_cc
+    class agc_fast_ff_impl : public agc_fast_ff,gr::analog::kernel::agc_ff
     {
      private:
       // Nothing to declare in this block.
 
      public:
-      agc_fast_impl(float rate = 1e-4, float reference = 1.0,
+      agc_fast_ff_impl(float rate = 1e-4, float reference = 1.0,
     		  float gain = 1.0);
-      ~agc_fast_impl();
+      ~agc_fast_ff_impl();
 
-      float rate() const { return kernel::agc_cc::rate(); }
-      float reference() const { return kernel::agc_cc::reference(); }
-      float gain() const { return kernel::agc_cc::gain(); }
-      float max_gain() const { return kernel::agc_cc::max_gain(); }
+      float rate() const { return gr::analog::kernel::agc_ff::rate(); }
+      float reference() const { return gr::analog::kernel::agc_ff::reference(); }
+      float gain() const { return gr::analog::kernel::agc_ff::gain(); }
+      float max_gain() const { return gr::analog::kernel::agc_ff::max_gain(); }
 
-      void set_rate(float rate) { kernel::agc_cc::set_rate(rate); }
-      void set_reference(float reference) { kernel::agc_cc::set_reference(reference); }
-      void set_gain(float gain) { kernel::agc_cc::set_gain(gain); }
-      virtual void set_max_gain(float max_gain) { kernel::agc_cc::set_max_gain(max_gain); }
+      void set_rate(float rate) { gr::analog::kernel::agc_ff::set_rate(rate); }
+      void set_reference(float reference) { gr::analog::kernel::agc_ff::set_reference(reference); }
+      void set_gain(float gain) { gr::analog::kernel::agc_ff::set_gain(gain); }
+      virtual void set_max_gain(float max_gain) { gr::analog::kernel::agc_ff::set_max_gain(max_gain); }
 
       // Where all the action really happens
       int work(int noutput_items,

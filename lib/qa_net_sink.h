@@ -19,8 +19,8 @@
  */
 
 
-#ifndef _QA_AGC_FAST_H_
-#define _QA_AGC_FAST_H_
+#ifndef _QA_NET_SINK_H_
+#define _QA_NET_SINK_H_
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
@@ -28,10 +28,10 @@
 namespace gr {
   namespace lfast {
 
-    class qa_agc_fast : public CppUnit::TestCase
+    class qa_net_sink : public CppUnit::TestCase
     {
     public:
-      CPPUNIT_TEST_SUITE(qa_agc_fast);
+      CPPUNIT_TEST_SUITE(qa_net_sink);
       CPPUNIT_TEST(t1);
       CPPUNIT_TEST_SUITE_END();
 
@@ -42,5 +42,5 @@ namespace gr {
   } /* namespace lfast */
 } /* namespace gr */
 
-#endif /* _QA_AGC_FAST_H_ */
+#endif /* _QA_NET_SINK_H_ */
 

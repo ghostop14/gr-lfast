@@ -19,38 +19,47 @@
  */
 
 
-#ifndef INCLUDED_TESTTIMING_CC2F2BYTEVECTOR_H
-#define INCLUDED_TESTTIMING_CC2F2BYTEVECTOR_H
+#ifndef INCLUDED_LFAST_AGC_FAST_FF_H
+#define INCLUDED_LFAST_AGC_FAST_FF_H
 
 #include <lfast/api.h>
-#include <gnuradio/sync_decimator.h>
+#include <gnuradio/sync_block.h>
 
 namespace gr {
   namespace lfast {
 
     /*!
      * \brief <+description of block+>
-     * \ingroup testtiming
+     * \ingroup lfast
      *
      */
-    class LFAST_API CC2F2ByteVector : virtual public gr::sync_decimator
+    class LFAST_API agc_fast_ff : virtual public gr::sync_block
     {
      public:
-      typedef boost::shared_ptr<CC2F2ByteVector> sptr;
+      typedef boost::shared_ptr<agc_fast_ff> sptr;
 
       /*!
-       * \brief Return a shared_ptr to a new instance of testtiming::CC2F2ByteVector.
+       * \brief Return a shared_ptr to a new instance of lfast::agc_fast.
        *
-       * To avoid accidental use of raw pointers, testtiming::CC2F2ByteVector's
+       * To avoid accidental use of raw pointers, lfast::agc_fast's
        * constructor is in a private implementation
-       * class. testtiming::CC2F2ByteVector::make is the public interface for
+       * class. lfast::agc_fast::make is the public interface for
        * creating new instances.
        */
-      static sptr make(int scale=1,int vecLength=1,int numVecItems=1);
+      static sptr make(float rate = 1e-4, float reference = 1.0, float gain = 1.0);
+      virtual float rate() const = 0;
+      virtual float reference() const = 0;
+      virtual float gain() const = 0;
+      virtual float max_gain() const = 0;
+
+      virtual void set_rate(float rate) = 0;
+      virtual void set_reference(float reference) = 0;
+      virtual void set_gain(float gain) = 0;
+      virtual void set_max_gain(float max_gain) = 0;
     };
 
-  } // namespace testtiming
+  } // namespace lfast
 } // namespace gr
 
-#endif /* INCLUDED_TESTTIMING_CC2F2BYTEVECTOR_H */
+#endif /* INCLUDED_LFAST_AGC_FAST_FF_H */
 

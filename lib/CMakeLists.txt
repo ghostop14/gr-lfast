@@ -28,6 +28,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 list(APPEND lfast_sources
     costas2_impl.cc
     agc_fast_impl.cc
+    agc_fast_ff_impl.cc
     CC2F2ByteVector_impl.cc
 )
 
@@ -38,7 +39,7 @@ if(NOT lfast_sources)
 endif(NOT lfast_sources)
 
 add_library(gnuradio-lfast SHARED ${lfast_sources})
-target_link_libraries(gnuradio-lfast ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES} gnuradio-blocks volk
+target_link_libraries(gnuradio-lfast ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES} boost_thread gnuradio-blocks volk
 )
 set_target_properties(gnuradio-lfast PROPERTIES DEFINE_SYMBOL "gnuradio_lfast_EXPORTS")
 
@@ -78,6 +79,7 @@ target_link_libraries(
   test-lfast
   ${GNURADIO_RUNTIME_LIBRARIES}
   ${Boost_LIBRARIES}
+  boost_thread
   ${CPPUNIT_LIBRARIES}
   gnuradio-blocks
   volk

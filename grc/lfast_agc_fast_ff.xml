@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<block>
+  <name>Accel AGC Float</name>
+  <key>lfast_agc_fast_ff</key>
+  <category>[LFAST Accelerated Blocks]</category>
+  <import>import lfast</import>
+  <make>lfast.agc_fast_ff($rate, $reference, $gain)
+self.$(id).set_max_gain($max_gain)</make>
+	<callback>set_rate($rate)</callback>
+	<callback>set_reference($reference)</callback>
+	<callback>set_gain($gain)</callback>
+	<callback>set_max_gain($max_gain)</callback>
+	<param>
+		<name>Rate</name>
+		<key>rate</key>
+		<value>1e-4</value>
+		<type>real</type>
+	</param>
+	<param>
+		<name>Reference</name>
+		<key>reference</key>
+		<value>1.0</value>
+		<type>real</type>
+	</param>
+	<param>
+		<name>Gain</name>
+		<key>gain</key>
+		<value>1.0</value>
+		<type>real</type>
+	</param>
+	<param>
+		<name>Max Gain</name>
+		<key>max_gain</key>
+		<value>65536</value>
+		<type>real</type>
+	</param>
+	<sink>
+		<name>in</name>
+		<type>float</type>
+	</sink>
+	<source>
+		<name>out</name>
+		<type>float</type>
+	</source>
+</block>
