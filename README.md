@@ -1,41 +1,47 @@
 # gr-lfast - Timed, tuned, and accelerated GNURadio blocks
 
-gr-lfast builds on gr-clenabled by focusing on CPU-only blocks and looking for optimizations.  For instance the Costas Loop module clocked at about 24 MSPS
-throughput.  However to process wider signals, this block would need to process more data.  Optimizations were identified in the code that increased 
-block throughput to 38 MSPS (almost 58% speed improvement).  The AGC block was given the same optimizations for about a 10% speed increase from 79 MSPS 
-to about 87 MSPS.  The block Complex->Real->Char->Vector combines Complex->Real, Float->char, and stream->Vector in a single block, saving on buffer copies and multiple threads.  Overall speedup on that block was nominal, 5-9%.  More blocks will be added as they are tested.
+gr-lfast builds on gr-clenabled by focusing on CPU-only blocks and looking for optimizations that can either allow the current native gnuradio
+code to run with faster throughput, or run with a lower load on existing CPU's.  Using basic C++ code optimization (minimizing function jumps,
+timing each line and looking for the heaviest CPU-intensive calls, etc.), it was possible to squeeze significant performance boosts without 
+the need to rewrite any of the signal processing algorithms.  
 
+For instance the native 2nd order Costas Loop module running on an i7-6700 clocked at processing about 22.2 Msps.  After optimizing the code
+the 2nd order loop was capable of processing almost 38 Msps (a 71% speed increase).  A 4th order loop went from about 21.8 Msps to almost 33 Msps
+(a 50.6% improvement).  
+  
+The same approach was applied to the AGC block for about a 12% speed increase from 91 MSPS to about 102.7 MSPS.  
 
-After building, in the build directory's lib subdirectory will be a file called test-lfast that will display metrics for before and after tuning on your system.  The following shows the throughput on an i7-6700 CPU @ 3.40GHz:
+The block Complex->Real->Char->Vector combines Complex->Real, Float->char, and stream->Vector in a single block, saving on buffer copies 
+and multiple threads.  Overall speedup on that block was nominal, 2-3%.  
+
+The plan is to add more blocks as I run into needing them.
+
+After building, in the build directory's lib subdirectory will be a file called test-lfast that will display metrics for before and after 
+tuning on your system.  The following shows the throughput on an i7-6700 CPU @ 3.40GHz:
 
 ----------------------------------------------------------
 
-Testing Costas Loop with 8192 samples...
+Testing 2nd order Costas Loop with 8192 samples...
+Original Code Run Time:      0.000369 s  (22218604.000000 sps)
+LFAST Code Run Time:      0.000216 s  (37982040.000000 sps)
+Speedup:         70.95% faster
 
-Original Code Run Time:      0.000339 s  (24134816.000000 sps)
-
-LFAST Code Run Time:      0.000215 s  (38078292.000000 sps)
-
-Speedup:         57.77% faster
+Testing 4th order Costas Loop with 8192 samples...
+Original Code Run Time:      0.000374 s  (21877034.000000 sps)
+LFAST Code Run Time:      0.000249 s  (32946308.000000 sps)
+Speedup:         50.60% faster
 
 ----------------------------------------------------------
-
 Testing AGC with 8192 samples...
-
-Original Code Run Time:      0.000103 s  (79309376.000000 sps)
-
-LFAST Code Run Time:      0.000094 s  (87053392.000000 sps)
-
-Speedup:          9.76% faster
+Original Code Run Time:      0.000090 s  (91348728.000000 sps)
+LFAST Code Run Time:      0.000080 s  (102704472.000000 sps)
+Speedup:         12.43% faster
 
 ----------------------------------------------------------
 Testing Complex->Real->Char->Vector with 8192 samples...
-
-Original Code Run Time:      0.000003 s  (3049752064.000000 sps)
-
-LFAST Code Run Time:      0.000003 s  (3263588864.000000 sps)
-
-Speedup:          7.01% faster
+Original Code Run Time:      0.000005 s  (1806749312.000000 sps)
+LFAST Code Run Time:      0.000004 s  (1854870912.000000 sps)
+Speedup:          2.66% faster
 
 
 To build gr-lfast, simply follow the standard module build process.  Git clone it to a directory, close GNURadio if you have it open, then use the following build steps:
@@ -50,9 +56,9 @@ cmake ..
 
 make
 
-sudo make install
+[sudo] make install
 
 sudo ldconfig
 
-If each step was successful (don�t overlook the �sudo ldconfig� step).
+If each step was successful (do not overlook the "sudo ldconfig" step).
 

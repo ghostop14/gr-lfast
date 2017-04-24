@@ -19,6 +19,7 @@
 
 install(FILES
     lfast_costas2.xml
+    lfast_costas4.xml
     lfast_agc_fast.xml
     lfast_agc_fast_ff.xml
     lfast_CC2F2ByteVector.xml

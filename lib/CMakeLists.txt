@@ -27,6 +27,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 list(APPEND lfast_sources
     costas2_impl.cc
+    costas4_impl.cc
     agc_fast_impl.cc
     agc_fast_ff_impl.cc
     CC2F2ByteVector_impl.cc
@@ -69,6 +70,7 @@ list(APPEND test_lfast_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/qa_agc_fast.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/qa_costas2.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/costas2_impl.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/costas4_impl.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/agc_fast_impl.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/CC2F2ByteVector_impl.cc
 )
