@@ -90,6 +90,9 @@ target_link_libraries(
   gnuradio-lfast
 )
 
+install(TARGETS test-lfast DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" RUNTIME)
+
+
 GR_ADD_TEST(test_lfast test-lfast)
 
 ########################################################################
