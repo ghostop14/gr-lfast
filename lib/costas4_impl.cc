@@ -27,6 +27,7 @@
 #include <gnuradio/sincos.h>
 #include <gnuradio/expj.h>
 #include <gnuradio/math.h>
+#include "clSComplex.h"
 
 #define CL_TWO_PI 6.28318530717958647692
 #define CL_MINUS_TWO_PI -6.28318530717958647692
@@ -158,11 +159,13 @@ namespace gr {
         gr_vector_const_void_star &input_items,
         gr_vector_void_star &output_items)
     {
-        const gr_complex *iptr = (gr_complex *) input_items[0];
-        gr_complex *optr = (gr_complex *) output_items[0];
+        // const gr_complex *iptr = (gr_complex *) input_items[0];
+        // gr_complex *optr = (gr_complex *) output_items[0];
+        const SComplex *iptr = (SComplex *) input_items[0];
+        SComplex *optr = (SComplex *) output_items[0];
         // gr_complex nco_out;
         float i_r,i_i,n_r,n_i,o_r,o_i;
-        float x1,x2;
+        // float x1,x2;
         int i;
         float angle_rad,sin,cos;
 
@@ -178,12 +181,12 @@ namespace gr {
           n_r = cosf(-d_phase);
 
           //optr[i] = iptr[i] * nco_out;
-          i_r = iptr[i].real();
-          i_i = iptr[i].imag();
+          i_r = iptr[i].real;
+          i_i = iptr[i].imag;
           o_r = (i_r * n_r) - (i_i*n_i);
           o_i = (i_r * n_i) + (i_i * n_r);
-          optr[i].real(o_r);
-          optr[i].imag(o_i);
+          optr[i].real = o_r;
+          optr[i].imag = o_i;
 
           //d_error = (*this.*d_phase_detector)(optr[i]);
           // 4th order in-place
@@ -191,15 +194,21 @@ namespace gr {
           d_error = (o_r>0 ? 1.0 : -1.0) * o_i - (o_i>0 ? 1.0 : -1.0) * o_r;
 
           // d_error = gr::branchless_clip(d_error, 1.0);
+          /*
           x1 = fabsf(d_error+1);
           x2 = fabsf(d_error-1);
           x1 -= x2;
           d_error = 0.5*x1;
+		  */
+          d_error = 0.5 * (fabsf(d_error+1) - fabsf(d_error-1));
 
           //advance_loop(d_error);
-          d_freq = d_freq + d_beta * d_error;
+          d_freq = d_beta * d_error + d_freq;
+          //d_freq = __builtin_fmaf(d_beta,d_error,d_freq);
           // This line is causing one of the greatest performance drops!  100 Msps -> 33 Msps!
-          d_phase = d_phase + d_freq + d_alpha * d_error;
+          d_phase = d_alpha * d_error + d_phase + d_freq;
+          // d_phase = d_phase + d_freq + d_alpha * d_error;
+          // d_phase = d_phase + __builtin_fmaf(d_alpha,d_error,d_freq);
 
           //phase_wrap();
           if (d_phase > CL_TWO_PI) {
@@ -226,15 +235,15 @@ namespace gr {
         gr_vector_const_void_star &input_items,
         gr_vector_void_star &output_items)
     {
-        const gr_complex *iptr = (gr_complex *) input_items[0];
-        gr_complex *optr = (gr_complex *) output_items[0];
+        // const gr_complex *iptr = (gr_complex *) input_items[0];
+        // gr_complex *optr = (gr_complex *) output_items[0];
+        const SComplex *iptr = (SComplex *) input_items[0];
+        SComplex *optr = (SComplex *) output_items[0];
         // gr_complex nco_out;
         float i_r,i_i,n_r,n_i,o_r,o_i;
-        float x1,x2;
+        // float x1,x2;
         int i;
         float angle_rad,sin,cos;
-
-        // gr_complex nco_out;
 
         for(i = 0; i < noutput_items; i++) {
           // nco_out = gr_expj(-d_phase);
@@ -243,17 +252,17 @@ namespace gr {
         	// gnuradio lookup functions - expensive with float_to_fixed in each iteration
         	// Tried rolling our own lookup tables - Same performance as straight trig
         	// Tried quadratic curve inline approximation - Tiny bit faster
-       	 // gr::sincosf(-d_phase, &n_i, &n_r);
-			n_i = sinf(-d_phase);
-			n_r = cosf(-d_phase);
+       	 //gr::sincosf(-d_phase, &n_i, &n_r);
+          n_i = sinf(-d_phase);
+          n_r = cosf(-d_phase);
 
           //optr[i] = iptr[i] * nco_out;
-          i_r = iptr[i].real();
-          i_i = iptr[i].imag();
+          i_r = iptr[i].real;
+          i_i = iptr[i].imag;
           o_r = (i_r * n_r) - (i_i*n_i);
           o_i = (i_r * n_i) + (i_i * n_r);
-          optr[i].real(o_r);
-          optr[i].imag(o_i);
+          optr[i].real = o_r;
+          optr[i].imag = o_i;
 
           //d_error = (*this.*d_phase_detector)(optr[i]);
           // 4th order in-place
@@ -261,15 +270,21 @@ namespace gr {
           d_error = (o_r>0 ? 1.0 : -1.0) * o_i - (o_i>0 ? 1.0 : -1.0) * o_r;
 
           // d_error = gr::branchless_clip(d_error, 1.0);
+          /*
           x1 = fabsf(d_error+1);
           x2 = fabsf(d_error-1);
           x1 -= x2;
           d_error = 0.5*x1;
+		  */
+          d_error = 0.5 * (fabsf(d_error+1) - fabsf(d_error-1));
 
           //advance_loop(d_error);
-          d_freq = d_freq + d_beta * d_error;
+          d_freq = d_beta * d_error + d_freq;
+          //d_freq = __builtin_fmaf(d_beta,d_error,d_freq);
           // This line is causing one of the greatest performance drops!  100 Msps -> 33 Msps!
-          d_phase = d_phase + d_freq + d_alpha * d_error;
+          d_phase = d_alpha * d_error + d_phase + d_freq;
+          // d_phase = d_phase + d_freq + d_alpha * d_error;
+          // d_phase = d_phase + __builtin_fmaf(d_alpha,d_error,d_freq);
 
           //phase_wrap();
           if (d_phase > CL_TWO_PI) {
@@ -286,23 +301,7 @@ namespace gr {
             d_freq = d_max_freq;
           else if(d_freq < d_min_freq)
             d_freq = d_min_freq;
-
-        /*
-         * original code
-		nco_out = gr_expj(-d_phase);
-		optr[i] = iptr[i] * nco_out;
-
-		d_error = (*this.*d_phase_detector)(optr[i]);
-		d_error = gr::branchless_clip(d_error, 1.0);
-
-		advance_loop(d_error);
-		phase_wrap();
-		frequency_limit();
-         */
-
         }
-
-        // consume_each (noutput_items);
 
         return noutput_items;
     }
