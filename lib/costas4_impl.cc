@@ -32,6 +32,21 @@
 #define CL_TWO_PI 6.28318530717958647692
 #define CL_MINUS_TWO_PI -6.28318530717958647692
 
+// assisted detection of Fused Multiply Add (FMA) functionality
+#if !defined(__FMA__) && defined(__AVX2__)
+#define __FMA__ 1
+#endif
+
+#if defined(FP_FAST_FMA)
+#define __FMA__ 1
+#endif
+
+#if defined(__FMA__)
+#pragma message "FMA support detected.  Compiling for Fused Multiply/Add support."
+#else
+#pragma message "No FMA support detected.  Compiling for normal math."
+#endif
+
 namespace gr {
   namespace lfast {
 
@@ -181,10 +196,16 @@ namespace gr {
           n_r = cosf(-d_phase);
 
           //optr[i] = iptr[i] * nco_out;
+          // FMA stands for fused multiply-add operations where FMA(a,b,c)=(a*b)+c and it does it as a single operation.
+#if defined(__FMA__)
+          o_r = __builtin_fmaf(iptr[i].real,n_r,-iptr[i].imag*n_i);
+          o_i = __builtin_fmaf(iptr[i].real,n_i,iptr[i].imag*n_r);
+#else
           i_r = iptr[i].real;
           i_i = iptr[i].imag;
           o_r = (i_r * n_r) - (i_i*n_i);
           o_i = (i_r * n_i) + (i_i * n_r);
+#endif
           optr[i].real = o_r;
           optr[i].imag = o_i;
 
@@ -194,7 +215,7 @@ namespace gr {
           d_error = (o_r>0 ? 1.0 : -1.0) * o_i - (o_i>0 ? 1.0 : -1.0) * o_r;
 
           // d_error = gr::branchless_clip(d_error, 1.0);
-          /*
+          /*  Taken out for speed and consolidated
           x1 = fabsf(d_error+1);
           x2 = fabsf(d_error-1);
           x1 -= x2;
@@ -203,10 +224,18 @@ namespace gr {
           d_error = 0.5 * (fabsf(d_error+1) - fabsf(d_error-1));
 
           //advance_loop(d_error);
+#if defined(__FMA__)
+          d_freq = __builtin_fmaf(d_beta,d_error,d_freq);
+#else
           d_freq = d_beta * d_error + d_freq;
+#endif
           //d_freq = __builtin_fmaf(d_beta,d_error,d_freq);
           // This line is causing one of the greatest performance drops!  100 Msps -> 33 Msps!
+#if defined(__FMA__)
+          d_phase += __builtin_fmaf(d_alpha,d_error,d_freq);
+#else
           d_phase = d_alpha * d_error + d_phase + d_freq;
+#endif
           // d_phase = d_phase + d_freq + d_alpha * d_error;
           // d_phase = d_phase + __builtin_fmaf(d_alpha,d_error,d_freq);
 
@@ -215,7 +244,7 @@ namespace gr {
   			while(d_phase>CL_TWO_PI)
   			  d_phase -= CL_TWO_PI;
           }
-          else {
+          else if (d_phase < CL_MINUS_TWO_PI){
   			while(d_phase< CL_MINUS_TWO_PI)
   			  d_phase += CL_TWO_PI;
           }
@@ -257,10 +286,16 @@ namespace gr {
           n_r = cosf(-d_phase);
 
           //optr[i] = iptr[i] * nco_out;
+          // FMA stands for fused multiply-add operations where FMA(a,b,c)=(a*b)+c and it does it as a single operation.
+#if defined(__FMA__)
+          o_r = __builtin_fmaf(iptr[i].real,n_r,-iptr[i].imag*n_i);
+          o_i = __builtin_fmaf(iptr[i].real,n_i,iptr[i].imag*n_r);
+#else
           i_r = iptr[i].real;
           i_i = iptr[i].imag;
           o_r = (i_r * n_r) - (i_i*n_i);
           o_i = (i_r * n_i) + (i_i * n_r);
+#endif
           optr[i].real = o_r;
           optr[i].imag = o_i;
 
@@ -270,7 +305,7 @@ namespace gr {
           d_error = (o_r>0 ? 1.0 : -1.0) * o_i - (o_i>0 ? 1.0 : -1.0) * o_r;
 
           // d_error = gr::branchless_clip(d_error, 1.0);
-          /*
+          /*  Taken out for speed and consolidated
           x1 = fabsf(d_error+1);
           x2 = fabsf(d_error-1);
           x1 -= x2;
@@ -279,10 +314,18 @@ namespace gr {
           d_error = 0.5 * (fabsf(d_error+1) - fabsf(d_error-1));
 
           //advance_loop(d_error);
+#if defined(__FMA__)
+          d_freq = __builtin_fmaf(d_beta,d_error,d_freq);
+#else
           d_freq = d_beta * d_error + d_freq;
+#endif
           //d_freq = __builtin_fmaf(d_beta,d_error,d_freq);
           // This line is causing one of the greatest performance drops!  100 Msps -> 33 Msps!
+#if defined(__FMA__)
+          d_phase += __builtin_fmaf(d_alpha,d_error,d_freq);
+#else
           d_phase = d_alpha * d_error + d_phase + d_freq;
+#endif
           // d_phase = d_phase + d_freq + d_alpha * d_error;
           // d_phase = d_phase + __builtin_fmaf(d_alpha,d_error,d_freq);
 
@@ -291,7 +334,7 @@ namespace gr {
   			while(d_phase>CL_TWO_PI)
   			  d_phase -= CL_TWO_PI;
           }
-          else {
+          else if (d_phase < CL_MINUS_TWO_PI){
   			while(d_phase< CL_MINUS_TWO_PI)
   			  d_phase += CL_TWO_PI;
           }

@@ -19,6 +19,31 @@
 
 set (CMAKE_CXX_STANDARD 11)
 
+# Reference for detection
+# https://gist.github.com/hideo55/5642892
+
+IF(UNIX)
+	IF(NOT APPLE)
+    	MESSAGE(STATUS "Detected Linux OS")
+		EXEC_PROGRAM(cat ARGS "/proc/cpuinfo" OUTPUT_VARIABLE CPUINFO)
+	ELSE(NOT APPLE)
+    	MESSAGE(STATUS "Detected Apple OS")
+		EXEC_PROGRAM("/usr/sbin/sysctl -n machdep.cpu.features" OUTPUT_VARIABLE CPUINFO)
+	ENDIF(NOT APPLE)
+	
+	STRING(REGEX REPLACE "^.*(fma).*$" "fma" FMA_THERE ${CPUINFO})
+   STRING(COMPARE EQUAL "fma" "${FMA_THERE}" FMA_TRUE)
+   IF (FMA_TRUE)
+		MESSAGE(STATUS "Found FMA.  Setting fma compile flag.")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfma")
+   ELSE (FMA_TRUE)
+		MESSAGE(STATUS "Not using FMA")
+	ENDIF (FMA_TRUE)
+ELSE()
+    MESSAGE(STATUS "OS is not linux.  Not setting FMA flags.")
+ENDIF()
+
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfma")
 ########################################################################
 # Setup library
 ########################################################################
@@ -40,6 +65,8 @@ if(NOT lfast_sources)
 	MESSAGE(STATUS "No C++ sources... skipping lib/")
 	return()
 endif(NOT lfast_sources)
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfma4")
 
 add_library(gnuradio-lfast SHARED ${lfast_sources})
 target_link_libraries(gnuradio-lfast ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES} boost_thread gnuradio-blocks volk
