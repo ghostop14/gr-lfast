@@ -26,6 +26,21 @@
 #include "agc_fast_ff_impl.h"
 #include <volk/volk.h>
 
+// assisted detection of Fused Multiply Add (FMA) functionality
+#if !defined(__FMA__) && defined(__AVX2__)
+#define __FMA__ 1
+#endif
+
+#if defined(FP_FAST_FMA)
+#define __FMA__ 1
+#endif
+
+#if defined(__FMA__)
+#pragma message "FMA support detected.  Compiling for Fused Multiply/Add support."
+#else
+#pragma message "No FMA support detected.  Compiling for normal math."
+#endif
+
 namespace gr {
   namespace lfast {
 
@@ -62,10 +77,24 @@ namespace gr {
 		      gr_vector_const_void_star &input_items,
 		      gr_vector_void_star &output_items)
     {
-      const float *in = (const float*)input_items[0];
-      float *out = (float*)output_items[0];
-      scaleN(out, in, noutput_items);
-      return noutput_items;
+        const float *in = (const float *)input_items[0];
+        float *out = (float *)output_items[0];
+
+        for (int i=0;i<noutput_items;i++) {
+      	  out[i] = in[i] * _gain;
+
+  #if defined(__FMA__)
+      	  _gain = __builtin_fmaf((_reference - std::abs(out[i])),_rate,_gain);
+      	  // _gain = (_reference - std::abs(out[i])) * _rate + _gain;
+  #else
+      	  _gain = (_reference - std::abs(out[i])) * _rate + _gain;
+  #endif
+
+      	  if(_max_gain > 0.0 && _gain > _max_gain)
+      	    _gain = _max_gain;
+
+        }
+        return noutput_items;
     }
 
     int
@@ -89,13 +118,12 @@ namespace gr {
       for (int i=0;i<noutput_items;i++) {
     	  out[i] = in[i] * _gain;
 
-    	  // _gain += (_reference - fabsf (out[i])) * _rate;
-
-    	  if (out[i] >= 0)
-    		  _gain += (_reference - out[i]) * _rate;
-    	  else
-    		  // fabs replacement
-    		  _gain += (_reference + out[i]) * _rate;
+#if defined(__FMA__)
+    	  _gain = __builtin_fmaf((_reference - std::abs(out[i])),_rate,_gain);
+    	  // _gain = (_reference - std::abs(out[i])) * _rate + _gain;
+#else
+    	  _gain = (_reference - std::abs(out[i])) * _rate + _gain;
+#endif
 
     	  if(_max_gain > 0.0 && _gain > _max_gain)
     	    _gain = _max_gain;
