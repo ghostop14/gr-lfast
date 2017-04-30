@@ -240,9 +240,9 @@ namespace gr {
           //d_freq = __builtin_fmaf(d_beta,d_error,d_freq);
           // This line is causing one of the greatest performance drops!  100 Msps -> 33 Msps!
 #if defined(__FMA__)
-          d_phase += __builtin_fmaf(d_alpha,d_error,d_freq);
+          d_phase = d_phase + __builtin_fmaf(d_alpha,d_error,d_freq);
 #else
-          d_phase = d_alpha * d_error + d_phase + d_freq;
+          d_phase = d_phase + d_alpha * d_error + d_freq;
 #endif
           // d_phase = d_phase + d_freq + d_alpha * d_error;
           // d_phase = d_phase + __builtin_fmaf(d_alpha,d_error,d_freq);
@@ -355,9 +355,9 @@ namespace gr {
           //d_freq = __builtin_fmaf(d_beta,d_error,d_freq);
           // This line is causing one of the greatest performance drops!  100 Msps -> 33 Msps!
 #if defined(__FMA__)
-          d_phase += __builtin_fmaf(d_alpha,d_error,d_freq);
+          d_phase = d_phase + __builtin_fmaf(d_alpha,d_error,d_freq);
 #else
-          d_phase = d_alpha * d_error + d_phase + d_freq;
+          d_phase = d_phase + d_alpha * d_error + d_freq;
 #endif
           // d_phase = d_phase + d_freq + d_alpha * d_error;
           // d_phase = d_phase + __builtin_fmaf(d_alpha,d_error,d_freq);
