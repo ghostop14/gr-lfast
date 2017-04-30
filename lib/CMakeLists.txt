@@ -43,6 +43,13 @@ ELSE()
     MESSAGE(STATUS "OS is not linux.  Not setting FMA flags.")
 ENDIF()
 
+IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
+	MESSAGE(STATUS "building for debug...")
+ELSE(CMAKE_BUILD_TYPE MATCHES DEBUG)
+	MESSAGE(STATUS "Release mode: increasing compiler optimizations...")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
+
 # If you wanted to explicitly force fma you can enable this:
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfma")
 
