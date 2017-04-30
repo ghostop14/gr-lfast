@@ -18,6 +18,11 @@
  * Boston, MA 02110-1301, USA.
  */
 
+
+//  Note:  To compile and generate intermingled assembly, use this command:
+// gcc -I $Gnuradio_DIR/include -c -g -Wa,-a,-ad costas2_impl.cc > costas2_impl.s
+// You can add the -mfma  switch to force fma compilation
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
