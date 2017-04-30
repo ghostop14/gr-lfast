@@ -43,7 +43,14 @@ ELSE()
     MESSAGE(STATUS "OS is not linux.  Not setting FMA flags.")
 ENDIF()
 
+# If you wanted to explicitly force fma you can enable this:
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfma")
+
+# you can also try adding --fast-math to make ALL calculations faster, however
+# it gets away from the IEEE standard and can cause issues.  However I don't think
+# it will in the code in this library.  However the performance ends up being
+# about the same as when fma is enabled.
+
 ########################################################################
 # Setup library
 ########################################################################

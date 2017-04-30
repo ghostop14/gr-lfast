@@ -333,7 +333,13 @@ namespace gr {
           x1 -= x2;
           d_error = 0.5*x1;
 		  */
-          d_error = 0.5 * (fabsf(d_error+1) - fabsf(d_error-1));
+
+          // d_error = 0.5 * (fabsf(d_error+1) - fabsf(d_error-1));
+
+          // See http://stackoverflow.com/questions/23474796/is-there-a-fast-fabsf-replacement-for-float-in-c
+          // for some notes on fabs performance
+          d_error = 0.5 * (std::abs(d_error+1) - std::abs(d_error-1));
+
 
           //advance_loop(d_error);
 #if defined(__FMA__)
