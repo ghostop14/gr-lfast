@@ -30,6 +30,7 @@
 #include "clSComplex.h"
 
 #define CL_TWO_PI 6.28318530717958647692
+#define CL_ONE_OVER_2PI 0.15915494309189533577
 #define CL_MINUS_TWO_PI -6.28318530717958647692
 
 // assisted detection of Fused Multiply Add (FMA) functionality
@@ -221,6 +222,7 @@ namespace gr {
           x1 -= x2;
           d_error = 0.5*x1;
 		  */
+          // d_error = 0.5 * (fabsf(d_error+1) - fabsf(d_error-1));
           d_error = 0.5 * (std::abs(d_error+1) - std::abs(d_error-1));
 
           //advance_loop(d_error);
@@ -241,7 +243,13 @@ namespace gr {
 
           //phase_wrap();
     		if ((d_phase > CL_TWO_PI) || (d_phase < CL_MINUS_TWO_PI)) {
-    			d_phase = d_phase / CL_TWO_PI - (float)((int)(d_phase / CL_TWO_PI));
+      			// d_phase = d_phase / CL_TWO_PI - (float)((int)(d_phase / CL_TWO_PI));
+    			// switch to multiplication for faster op
+    #if defined(__FMA__)
+      			d_phase = __builtin_fmaf(d_phase,CL_ONE_OVER_2PI,-(float)((int)(d_phase * CL_ONE_OVER_2PI)));
+    #else
+    			d_phase = d_phase * CL_ONE_OVER_2PI - (float)((int)(d_phase * CL_ONE_OVER_2PI));
+    #endif
     			d_phase = d_phase * CL_TWO_PI;
     		}
 
@@ -341,7 +349,13 @@ namespace gr {
 
           //phase_wrap();
     		if ((d_phase > CL_TWO_PI) || (d_phase < CL_MINUS_TWO_PI)) {
-    			d_phase = d_phase / CL_TWO_PI - (float)((int)(d_phase / CL_TWO_PI));
+      			// d_phase = d_phase / CL_TWO_PI - (float)((int)(d_phase / CL_TWO_PI));
+    			// switch to multiplication for faster op
+    #if defined(__FMA__)
+      			d_phase = __builtin_fmaf(d_phase,CL_ONE_OVER_2PI,-(float)((int)(d_phase * CL_ONE_OVER_2PI)));
+    #else
+    			d_phase = d_phase * CL_ONE_OVER_2PI - (float)((int)(d_phase * CL_ONE_OVER_2PI)));
+    #endif
     			d_phase = d_phase * CL_TWO_PI;
     		}
 
