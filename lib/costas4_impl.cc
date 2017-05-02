@@ -240,14 +240,23 @@ namespace gr {
           // d_phase = d_phase + __builtin_fmaf(d_alpha,d_error,d_freq);
 
           //phase_wrap();
-          if (d_phase > CL_TWO_PI) {
-  			while(d_phase>CL_TWO_PI)
-  			  d_phase -= CL_TWO_PI;
-          }
-          else if (d_phase < CL_MINUS_TWO_PI){
-  			while(d_phase< CL_MINUS_TWO_PI)
-  			  d_phase += CL_TWO_PI;
-          }
+    		if ((d_phase > CL_TWO_PI) || (d_phase < CL_MINUS_TWO_PI)) {
+    			d_phase = d_phase / CL_TWO_PI - (float)((int)(d_phase / CL_TWO_PI));
+    			d_phase = d_phase * CL_TWO_PI;
+    		}
+
+            /*
+            if (d_phase > CL_TWO_PI) {
+    			while(d_phase>CL_TWO_PI) {
+    			  d_phase -= CL_TWO_PI;
+    			}
+            }
+            else if (d_phase < CL_MINUS_TWO_PI) {
+    			while(d_phase < CL_MINUS_TWO_PI) {
+    			  d_phase += CL_TWO_PI;
+    			}
+            }
+  		  */
 
           //frequency_limit();
           if(d_freq > d_max_freq)
@@ -331,14 +340,23 @@ namespace gr {
           // d_phase = d_phase + __builtin_fmaf(d_alpha,d_error,d_freq);
 
           //phase_wrap();
-          if (d_phase > CL_TWO_PI) {
-  			while(d_phase>CL_TWO_PI)
-  			  d_phase -= CL_TWO_PI;
-          }
-          else if (d_phase < CL_MINUS_TWO_PI){
-  			while(d_phase< CL_MINUS_TWO_PI)
-  			  d_phase += CL_TWO_PI;
-          }
+    		if ((d_phase > CL_TWO_PI) || (d_phase < CL_MINUS_TWO_PI)) {
+    			d_phase = d_phase / CL_TWO_PI - (float)((int)(d_phase / CL_TWO_PI));
+    			d_phase = d_phase * CL_TWO_PI;
+    		}
+
+            /*
+            if (d_phase > CL_TWO_PI) {
+    			while(d_phase>CL_TWO_PI) {
+    			  d_phase -= CL_TWO_PI;
+    			}
+            }
+            else if (d_phase < CL_MINUS_TWO_PI) {
+    			while(d_phase < CL_MINUS_TWO_PI) {
+    			  d_phase += CL_TWO_PI;
+    			}
+            }
+  		  */
 
           //frequency_limit();
           if(d_freq > d_max_freq)
