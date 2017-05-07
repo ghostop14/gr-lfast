@@ -354,7 +354,7 @@ namespace gr {
     #if defined(__FMA__)
       			d_phase = __builtin_fmaf(d_phase,CL_ONE_OVER_2PI,-(float)((int)(d_phase * CL_ONE_OVER_2PI)));
     #else
-    			d_phase = d_phase * CL_ONE_OVER_2PI - (float)((int)(d_phase * CL_ONE_OVER_2PI)));
+    			d_phase = d_phase * CL_ONE_OVER_2PI - (float)((int)(d_phase * CL_ONE_OVER_2PI));
     #endif
     			d_phase = d_phase * CL_TWO_PI;
     		}
