@@ -23,5 +23,9 @@ install(FILES
     lfast_agc_fast.xml
     lfast_agc_fast_ff.xml
     lfast_CC2F2ByteVector.xml
+    lfast_low_pass_filter.xml
+    lfast_high_pass_filter.xml
+    lfast_root_raised_cosine_filter.xml
     DESTINATION share/gnuradio/grc/blocks
+    
 )
