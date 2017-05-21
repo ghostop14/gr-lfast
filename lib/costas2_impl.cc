@@ -200,8 +200,26 @@ namespace gr {
         	// Tried rolling our own lookup tables - Same performance as straight trig
         	// Tried quadratic curve inline approximation - Tiny bit faster
        	 // gr::sincosf(-d_phase, &n_i, &n_r);
+      		if ((d_phase > CL_TWO_PI) || (d_phase < CL_MINUS_TWO_PI)) {
+      			// d_phase = d_phase / CL_TWO_PI - (float)((int)(d_phase / CL_TWO_PI));
+    			// switch to multiplication for faster op
+    #if defined(__FMA__)
+      			d_phase = __builtin_fmaf(d_phase,CL_ONE_OVER_2PI,-(float)((int)(d_phase * CL_ONE_OVER_2PI)));
+    #else
+    			d_phase = d_phase * CL_ONE_OVER_2PI - (float)((int)(d_phase * CL_ONE_OVER_2PI));
+    #endif
+      			d_phase = d_phase * CL_TWO_PI;
+      		}
 			n_i = sinf(-d_phase);
 			n_r = cosf(-d_phase);
+			/*
+			 // Doesn't produce decodable results, AND it's slower.
+#if defined(__FMA__)
+			n_r = sqrtf(__builtin_fmaf(n_i,-n_i,1));
+#else
+			n_r = sqrtf(1-n_i*n_i);
+#endif
+			*/
 
           //optr[i] = iptr[i] * nco_out;
 
@@ -255,16 +273,6 @@ namespace gr {
           // d_phase = d_phase + __builtin_fmaf(d_alpha,d_error,d_freq);
 
           //phase_wrap();
-  		if ((d_phase > CL_TWO_PI) || (d_phase < CL_MINUS_TWO_PI)) {
-  			// d_phase = d_phase / CL_TWO_PI - (float)((int)(d_phase / CL_TWO_PI));
-			// switch to multiplication for faster op
-#if defined(__FMA__)
-  			d_phase = __builtin_fmaf(d_phase,CL_ONE_OVER_2PI,-(float)((int)(d_phase * CL_ONE_OVER_2PI)));
-#else
-			d_phase = d_phase * CL_ONE_OVER_2PI - (float)((int)(d_phase * CL_ONE_OVER_2PI));
-#endif
-  			d_phase = d_phase * CL_TWO_PI;
-  		}
 
           /*
           if (d_phase > CL_TWO_PI) {
@@ -326,10 +334,28 @@ namespace gr {
         	// gnuradio lookup functions - expensive with float_to_fixed in each iteration
         	// Tried rolling our own lookup tables - Same performance as straight trig
         	// Tried quadratic curve inline approximation - Tiny bit faster
-       	 // gr::sincosf(-d_phase, &n_i, &n_r);
+
+      		if ((d_phase > CL_TWO_PI) || (d_phase < CL_MINUS_TWO_PI)) {
+      			// d_phase = d_phase / CL_TWO_PI - (float)((int)(d_phase / CL_TWO_PI));
+    			// switch to multiplication for faster op
+    #if defined(__FMA__)
+      			d_phase = __builtin_fmaf(d_phase,CL_ONE_OVER_2PI,-(float)((int)(d_phase * CL_ONE_OVER_2PI)));
+    #else
+    			d_phase = d_phase * CL_ONE_OVER_2PI - (float)((int)(d_phase * CL_ONE_OVER_2PI));
+    #endif
+      			d_phase = d_phase * CL_TWO_PI;
+      		}
+        	// gr::sincosf(-d_phase, &n_i, &n_r);
 			n_i = sinf(-d_phase);
 			n_r = cosf(-d_phase);
-
+			/*
+			 // Doesn't produce decodable results, AND it's slower.
+#if defined(__FMA__)
+			n_r = sqrtf(__builtin_fmaf(n_i,-n_i,1));
+#else
+			n_r = sqrtf(1-n_i*n_i);
+#endif
+			*/
           //optr[i] = iptr[i] * nco_out;
 
           // FMA stands for fused multiply-add operations where FMA(a,b,c)=(a*b)+c and it does it as a single operation.
@@ -382,16 +408,7 @@ namespace gr {
           // d_phase = d_phase + __builtin_fmaf(d_alpha,d_error,d_freq);
 
           //phase_wrap();
-  		if ((d_phase > CL_TWO_PI) || (d_phase < CL_MINUS_TWO_PI)) {
-  			// d_phase = d_phase / CL_TWO_PI - (float)((int)(d_phase / CL_TWO_PI));
-			// switch to multiplication for faster op
-#if defined(__FMA__)
-  			d_phase = __builtin_fmaf(d_phase,CL_ONE_OVER_2PI,-(float)((int)(d_phase * CL_ONE_OVER_2PI)));
-#else
-			d_phase = d_phase * CL_ONE_OVER_2PI - (float)((int)(d_phase * CL_ONE_OVER_2PI));
-#endif
-  			d_phase = d_phase * CL_TWO_PI;
-  		}
+          // Moved to top of loop.
 
           /*
           if (d_phase > CL_TWO_PI) {

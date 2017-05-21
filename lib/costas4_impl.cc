@@ -193,6 +193,16 @@ namespace gr {
         	// Tried rolling our own lookup tables - Same performance as straight trig
         	// Tried quadratic curve inline approximation - Tiny bit faster
        	 //gr::sincosf(-d_phase, &n_i, &n_r);
+    		if ((d_phase > CL_TWO_PI) || (d_phase < CL_MINUS_TWO_PI)) {
+      			// d_phase = d_phase / CL_TWO_PI - (float)((int)(d_phase / CL_TWO_PI));
+    			// switch to multiplication for faster op
+    #if defined(__FMA__)
+      			d_phase = __builtin_fmaf(d_phase,CL_ONE_OVER_2PI,-(float)((int)(d_phase * CL_ONE_OVER_2PI)));
+    #else
+    			d_phase = d_phase * CL_ONE_OVER_2PI - (float)((int)(d_phase * CL_ONE_OVER_2PI));
+    #endif
+    			d_phase = d_phase * CL_TWO_PI;
+    		}
           n_i = sinf(-d_phase);
           n_r = cosf(-d_phase);
 
@@ -242,16 +252,7 @@ namespace gr {
           // d_phase = d_phase + __builtin_fmaf(d_alpha,d_error,d_freq);
 
           //phase_wrap();
-    		if ((d_phase > CL_TWO_PI) || (d_phase < CL_MINUS_TWO_PI)) {
-      			// d_phase = d_phase / CL_TWO_PI - (float)((int)(d_phase / CL_TWO_PI));
-    			// switch to multiplication for faster op
-    #if defined(__FMA__)
-      			d_phase = __builtin_fmaf(d_phase,CL_ONE_OVER_2PI,-(float)((int)(d_phase * CL_ONE_OVER_2PI)));
-    #else
-    			d_phase = d_phase * CL_ONE_OVER_2PI - (float)((int)(d_phase * CL_ONE_OVER_2PI));
-    #endif
-    			d_phase = d_phase * CL_TWO_PI;
-    		}
+          // Moved up top
 
             /*
             if (d_phase > CL_TWO_PI) {
@@ -299,6 +300,16 @@ namespace gr {
         	// Tried rolling our own lookup tables - Same performance as straight trig
         	// Tried quadratic curve inline approximation - Tiny bit faster
        	 //gr::sincosf(-d_phase, &n_i, &n_r);
+    		if ((d_phase > CL_TWO_PI) || (d_phase < CL_MINUS_TWO_PI)) {
+      			// d_phase = d_phase / CL_TWO_PI - (float)((int)(d_phase / CL_TWO_PI));
+    			// switch to multiplication for faster op
+    #if defined(__FMA__)
+      			d_phase = __builtin_fmaf(d_phase,CL_ONE_OVER_2PI,-(float)((int)(d_phase * CL_ONE_OVER_2PI)));
+    #else
+    			d_phase = d_phase * CL_ONE_OVER_2PI - (float)((int)(d_phase * CL_ONE_OVER_2PI));
+    #endif
+    			d_phase = d_phase * CL_TWO_PI;
+    		}
           n_i = sinf(-d_phase);
           n_r = cosf(-d_phase);
 
@@ -348,17 +359,7 @@ namespace gr {
           // d_phase = d_phase + __builtin_fmaf(d_alpha,d_error,d_freq);
 
           //phase_wrap();
-    		if ((d_phase > CL_TWO_PI) || (d_phase < CL_MINUS_TWO_PI)) {
-      			// d_phase = d_phase / CL_TWO_PI - (float)((int)(d_phase / CL_TWO_PI));
-    			// switch to multiplication for faster op
-    #if defined(__FMA__)
-      			d_phase = __builtin_fmaf(d_phase,CL_ONE_OVER_2PI,-(float)((int)(d_phase * CL_ONE_OVER_2PI)));
-    #else
-    			d_phase = d_phase * CL_ONE_OVER_2PI - (float)((int)(d_phase * CL_ONE_OVER_2PI));
-    #endif
-    			d_phase = d_phase * CL_TWO_PI;
-    		}
-
+          // Moved up top
             /*
             if (d_phase > CL_TWO_PI) {
     			while(d_phase>CL_TWO_PI) {
