@@ -17,6 +17,7 @@ The goal of the gr-lfast project is to increase flowgraph performance while runn
 4.  FFT-based High Pass Filter Convenience Wrapper
 5.  FFT-based Root Raised Cosine Filter Convenience Wrapper
 6.  Aggregated block that does Complex to Real->Byte->Vector in a single C++ implementation
+
 **New** 7.  n*log10(x) + k implemented with Volk
 
 ## Command-line tools
