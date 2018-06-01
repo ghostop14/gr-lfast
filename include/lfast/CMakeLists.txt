@@ -26,5 +26,6 @@ install(FILES
     costas4.h
     agc_fast.h
     CC2F2ByteVector.h
-    DESTINATION include/lfast
+    nlog10volk.h
+    quad_demod_volk.h DESTINATION include/lfast
 )

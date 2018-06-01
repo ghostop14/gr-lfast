@@ -37,6 +37,8 @@
 #include "costas4_impl.h"
 #include "agc_fast_impl.h"
 #include "CC2F2ByteVector_impl.h"
+#include "nlog10volk_impl.h"
+#include "quad_demod_volk_impl.h"
 
 int largeBlockSize=8192;
 
@@ -213,6 +215,173 @@ void timeAGC() {
 	delete test;
 }
 
+void timeLog10() {
+	std::cout << "----------------------------------------------------------" << std::endl;
+
+	int localblocksize=largeBlockSize;
+
+	std::cout << "Testing volk nlog10+k with " << localblocksize << " samples..." << std::endl;
+
+	nlog10volk_impl *test;
+	test = new nlog10volk_impl(10.0,1,2);
+
+
+	int i;
+	std::chrono::time_point<std::chrono::steady_clock> start, end;
+	std::chrono::duration<double> elapsed_seconds = end-start;
+	std::vector<int> ninitems;
+
+
+	std::vector<gr_complex> inputItems;
+	std::vector<gr_complex> outputItems;
+	std::vector<gr_complex> outputItems2;
+	std::vector<const void *> inputPointers;
+	std::vector<void *> outputPointers;
+	std::vector<void *> outputPointers2;
+
+	gr_complex grZero(0.0,0.0);
+	gr_complex newComplex(1.0,0.5);
+
+	for (i=0;i<localblocksize;i++) {
+		inputItems.push_back(gr_complex(1.0f,0.5f));
+		outputItems.push_back(grZero);
+		outputItems2.push_back(grZero);
+	}
+
+	inputPointers.push_back((const void *)&inputItems[0]);
+	outputPointers.push_back((void *)&outputItems[0]);
+	outputPointers2.push_back((void *)&outputItems2[0]);
+
+	ninitems.push_back(localblocksize);
+
+	int noutputitems;
+	int iterations = 100;
+	float elapsed_time,throughput_original,throughput;
+
+	noutputitems = test->work_original(localblocksize,inputPointers,outputPointers);
+
+	start = std::chrono::steady_clock::now();
+	// make iterations calls to get average.
+	for (i=0;i<iterations;i++) {
+		noutputitems = test->work_original(localblocksize,inputPointers,outputPointers);
+	}
+	end = std::chrono::steady_clock::now();
+
+	elapsed_seconds = end-start;
+
+	elapsed_time = elapsed_seconds.count()/(float)iterations;
+	throughput_original = localblocksize / elapsed_time;
+
+	std::cout << "Original Code Run Time:   " << std::fixed << std::setw(11)
+    << std::setprecision(6) << elapsed_time << " s  (" << throughput_original << " sps)" << std::endl;
+
+	// New Code
+	// -----------------------------
+	start = std::chrono::steady_clock::now();
+	// make iterations calls to get average.
+	for (i=0;i<iterations;i++) {
+		noutputitems = test->work_test(localblocksize,inputPointers,outputPointers);
+	}
+	end = std::chrono::steady_clock::now();
+
+	elapsed_seconds = end-start;
+
+	elapsed_time = elapsed_seconds.count()/(float)iterations;
+	throughput = localblocksize / elapsed_time;
+
+	std::cout << "LFAST Code Run Time:   " << std::fixed << std::setw(11)
+    << std::setprecision(6) << elapsed_time << " s  (" << throughput << " sps)" << std::endl;
+
+	float faster = (throughput / throughput_original - 1) * 100.0;
+	std::cout << "Speedup:   " << std::fixed << std::setw(11)
+    << std::setprecision(2) << faster << "% faster" << std::endl << std::endl;
+
+	delete test;
+}
+
+void timeQuadDemod() {
+	std::cout << "----------------------------------------------------------" << std::endl;
+
+	int localblocksize=largeBlockSize;
+
+	std::cout << "Testing volk quad demod with " << localblocksize << " samples..." << std::endl;
+
+	quad_demod_volk_impl *test;
+	test = new quad_demod_volk_impl(10.0);
+
+
+	int i;
+	std::chrono::time_point<std::chrono::steady_clock> start, end;
+	std::chrono::duration<double> elapsed_seconds = end-start;
+	std::vector<int> ninitems;
+
+
+	std::vector<gr_complex> inputItems;
+	std::vector<gr_complex> outputItems;
+	std::vector<gr_complex> outputItems2;
+	std::vector<const void *> inputPointers;
+	std::vector<void *> outputPointers;
+	std::vector<void *> outputPointers2;
+
+	gr_complex grZero(0.0,0.0);
+	gr_complex newComplex(1.0,0.5);
+
+	for (i=0;i<localblocksize;i++) {
+		inputItems.push_back(gr_complex(1.0f,0.5f));
+		outputItems.push_back(grZero);
+		outputItems2.push_back(grZero);
+	}
+
+	inputPointers.push_back((const void *)&inputItems[0]);
+	outputPointers.push_back((void *)&outputItems[0]);
+	outputPointers2.push_back((void *)&outputItems2[0]);
+
+	ninitems.push_back(localblocksize);
+
+	int noutputitems;
+	int iterations = 100;
+	float elapsed_time,throughput_original,throughput;
+
+	noutputitems = test->work_original(localblocksize,inputPointers,outputPointers);
+
+	start = std::chrono::steady_clock::now();
+	// make iterations calls to get average.
+	for (i=0;i<iterations;i++) {
+		noutputitems = test->work_original(localblocksize,inputPointers,outputPointers);
+	}
+	end = std::chrono::steady_clock::now();
+
+	elapsed_seconds = end-start;
+
+	elapsed_time = elapsed_seconds.count()/(float)iterations;
+	throughput_original = localblocksize / elapsed_time;
+
+	std::cout << "Original Code Run Time:   " << std::fixed << std::setw(11)
+    << std::setprecision(6) << elapsed_time << " s  (" << throughput_original << " sps)" << std::endl;
+
+	// New Code
+	// -----------------------------
+	start = std::chrono::steady_clock::now();
+	// make iterations calls to get average.
+	for (i=0;i<iterations;i++) {
+		noutputitems = test->work_test(localblocksize,inputPointers,outputPointers);
+	}
+	end = std::chrono::steady_clock::now();
+
+	elapsed_seconds = end-start;
+
+	elapsed_time = elapsed_seconds.count()/(float)iterations;
+	throughput = localblocksize / elapsed_time;
+
+	std::cout << "LFAST Code Run Time:   " << std::fixed << std::setw(11)
+    << std::setprecision(6) << elapsed_time << " s  (" << throughput << " sps)" << std::endl;
+
+	float faster = (throughput / throughput_original - 1) * 100.0;
+	std::cout << "Speedup:   " << std::fixed << std::setw(11)
+    << std::setprecision(2) << faster << "% faster" << std::endl << std::endl;
+
+	delete test;
+}
 void timeCostasLoop2() {
 	int localblocksize=largeBlockSize;
 
@@ -395,6 +564,9 @@ main (int argc, char **argv)
 	timeCostasLoop4();
 	timeAGC();
 	timeCC2Vector();
+
+	timeLog10();
+	// timeQuadDemod();
 
 	return 0;
 

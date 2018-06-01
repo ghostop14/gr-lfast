@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<block>
+  <name>Quadrature Demod Volk</name>
+  <key>lfast_quad_demod_volk</key>
+  <category>[LFAST Accelerated Blocks]</category>
+  <import>import lfast</import>
+  <make>lfast.quad_demod_volk($gain)</make>
+  <callback>set_gain($gain)</callback>
+    <param>
+        <name>Gain</name>
+        <key>gain</key>
+        <value>samp_rate/(2*math.pi*fsk_deviation_hz/8.0)</value>
+        <type>real</type>
+    </param>
+    <sink>
+        <name>in</name>
+        <type>complex</type>
+    </sink>
+    <source>
+        <name>out</name>
+        <type>float</type>
+    </source>
+</block>

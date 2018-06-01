@@ -72,6 +72,8 @@ list(APPEND lfast_sources
     agc_fast_impl.cc
     agc_fast_ff_impl.cc
     CC2F2ByteVector_impl.cc
+    nlog10volk_impl.cc
+    quad_demod_volk_impl.cc
 )
 
 set(lfast_sources "${lfast_sources}" PARENT_SCOPE)
@@ -116,6 +118,8 @@ list(APPEND test_lfast_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/costas4_impl.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/agc_fast_impl.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/CC2F2ByteVector_impl.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/nlog10volk_impl.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/quad_demod_volk_impl.cc
 )
 
 add_executable(test-lfast ${test_lfast_sources})

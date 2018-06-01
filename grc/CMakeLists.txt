@@ -26,6 +26,9 @@ install(FILES
     lfast_low_pass_filter.xml
     lfast_high_pass_filter.xml
     lfast_root_raised_cosine_filter.xml
+    lfast_nlog10volk.xml
     DESTINATION share/gnuradio/grc/blocks
     
 )
+
+# lfast_quad_demod_volk.xml 

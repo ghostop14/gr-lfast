@@ -13,6 +13,8 @@
 #include "lfast/agc_fast.h"
 #include "lfast/agc_fast_ff.h"
 #include "lfast/CC2F2ByteVector.h"
+#include "lfast/nlog10volk.h"
+#include "lfast/quad_demod_volk.h"
 %}
 
 
@@ -26,3 +28,7 @@ GR_SWIG_BLOCK_MAGIC2(lfast, agc_fast);
 GR_SWIG_BLOCK_MAGIC2(lfast, agc_fast_ff);
 %include "lfast/CC2F2ByteVector.h"
 GR_SWIG_BLOCK_MAGIC2(lfast, CC2F2ByteVector);
+%include "lfast/nlog10volk.h"
+GR_SWIG_BLOCK_MAGIC2(lfast, nlog10volk);
+%include "lfast/quad_demod_volk.h"
+GR_SWIG_BLOCK_MAGIC2(lfast, quad_demod_volk);

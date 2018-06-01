@@ -7,6 +7,8 @@ The goal of the gr-lfast project is to increase flowgraph performance while runn
 2.  Block consolidation at the code level rather than a hierarchical block
 3.  For filters, the OpenCL gr-clenabled project timing study called out that the GNURadio FFT filters are much faster than the FIR versions.  However the standard convenience wrappers for low pass, high pass, and root-raised cosine among others are using the FIR filters.  Therefore convenience wrappers around the FFT equivalents are included here as well.
 
+**New** An approach to bring Volk SIMD to the log10 block has been added as well
+
 ## Included Blocks
 
 1.  Costas Loop (2nd and 4th Order)
@@ -15,6 +17,7 @@ The goal of the gr-lfast project is to increase flowgraph performance while runn
 4.  FFT-based High Pass Filter Convenience Wrapper
 5.  FFT-based Root Raised Cosine Filter Convenience Wrapper
 6.  Aggregated block that does Complex to Real->Byte->Vector in a single C++ implementation
+**New** 7.  n*log10(x) + k implemented with Volk
 
 ## Command-line tools
 
@@ -53,31 +56,35 @@ and multiple threads.  Overall speedup on that block was nominal, 2-3%.
 The plan is to add more blocks as I run into needing them.
 
 After building, in the build directory's lib subdirectory will be a file called test-lfast that will display metrics for before and after 
-tuning on your system.  The following shows the throughput on an i7-6700 CPU @ 3.40GHz:
-
-----------------------------------------------------------
+tuning on your system.  The following shows the throughput on a laptop with an Intel i7-7700HQ 7th Gen processor.
 
 Testing 2nd order Costas Loop with 8192 samples...
-Original Code Run Time:      0.000369 s  (22218604.000000 sps)
-LFAST Code Run Time:      0.000216 s  (37982040.000000 sps)
-Speedup:         70.95% faster
+Original Code Run Time:      0.000613 s  (13358778.000000 sps)
+LFAST Code Run Time:      0.000285 s  (28697090.000000 sps)
+Speedup:        114.82% faster
 
 Testing 4th order Costas Loop with 8192 samples...
-Original Code Run Time:      0.000374 s  (21877034.000000 sps)
-LFAST Code Run Time:      0.000249 s  (32946308.000000 sps)
-Speedup:         50.60% faster
+Original Code Run Time:      0.000512 s  (15993678.000000 sps)
+LFAST Code Run Time:      0.000327 s  (25063888.000000 sps)
+Speedup:         56.71% faster
 
 ----------------------------------------------------------
 Testing AGC with 8192 samples...
-Original Code Run Time:      0.000090 s  (91348728.000000 sps)
-LFAST Code Run Time:      0.000080 s  (102704472.000000 sps)
-Speedup:         12.43% faster
+Original Code Run Time:      0.000119 s  (69126912.000000 sps)
+LFAST Code Run Time:      0.000110 s  (74262144.000000 sps)
+Speedup:          7.43% faster
 
 ----------------------------------------------------------
 Testing Complex->Real->Char->Vector with 8192 samples...
-Original Code Run Time:      0.000005 s  (1806749312.000000 sps)
-LFAST Code Run Time:      0.000004 s  (1854870912.000000 sps)
-Speedup:          2.66% faster
+Original Code Run Time:      0.000005 s  (1640657536.000000 sps)
+LFAST Code Run Time:      0.000005 s  (1660787456.000000 sps)
+Speedup:          1.23% faster
+
+----------------------------------------------------------
+Testing nlog10+k with 8192 samples...
+Original Code Run Time:      0.000161 s  (50971952.000000 sps)
+LFAST Code Run Time:      0.000006 s  (1453247488.000000 sps)
+Speedup:       2751.07% faster
 
 
 
