@@ -27,6 +27,8 @@ install(FILES
     lfast_high_pass_filter.xml
     lfast_root_raised_cosine_filter.xml
     lfast_nlog10volk.xml
+    lfast_MTFIRLowPassFilterXX.xml
+    lfast_MTFIRFilterXX.xml
     DESTINATION share/gnuradio/grc/blocks
     
 )

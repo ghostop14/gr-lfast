@@ -27,5 +27,8 @@ install(FILES
     agc_fast.h
     CC2F2ByteVector.h
     nlog10volk.h
-    quad_demod_volk.h DESTINATION include/lfast
+    quad_demod_volk.h
+    MTFIRFilterCCF.h
+    MTFIRFilterFF.h
+    MTFIRFilterCCC.h DESTINATION include/lfast
 )

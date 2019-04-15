@@ -74,6 +74,10 @@ list(APPEND lfast_sources
     CC2F2ByteVector_impl.cc
     nlog10volk_impl.cc
     quad_demod_volk_impl.cc
+    MTFIRFilterCCF_impl.cc
+    MTFIRFilterFF_impl.cc
+    fir_filter_lfast.cc
+    MTFIRFilterCCC_impl.cc
 )
 
 set(lfast_sources "${lfast_sources}" PARENT_SCOPE)
@@ -85,7 +89,7 @@ endif(NOT lfast_sources)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfma4")
 
 add_library(gnuradio-lfast SHARED ${lfast_sources})
-target_link_libraries(gnuradio-lfast ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES} boost_thread gnuradio-blocks volk
+target_link_libraries(gnuradio-lfast ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES} boost_thread gnuradio-blocks gnuradio-filter volk thrift
 )
 set_target_properties(gnuradio-lfast PROPERTIES DEFINE_SYMBOL "gnuradio_lfast_EXPORTS")
 
@@ -120,6 +124,8 @@ list(APPEND test_lfast_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/CC2F2ByteVector_impl.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/nlog10volk_impl.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/quad_demod_volk_impl.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/MTFIRFilterCCF_impl.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/fir_filter_lfast.cc
 )
 
 add_executable(test-lfast ${test_lfast_sources})
@@ -131,6 +137,8 @@ target_link_libraries(
   boost_thread
   ${CPPUNIT_LIBRARIES}
   gnuradio-blocks
+  gnuradio-filter
+  thrift
   volk
   gnuradio-lfast
 )

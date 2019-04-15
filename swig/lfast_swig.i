@@ -15,6 +15,9 @@
 #include "lfast/CC2F2ByteVector.h"
 #include "lfast/nlog10volk.h"
 #include "lfast/quad_demod_volk.h"
+#include "lfast/MTFIRFilterCCF.h"
+#include "lfast/MTFIRFilterFF.h"
+#include "lfast/MTFIRFilterCCC.h"
 %}
 
 
@@ -32,3 +35,9 @@ GR_SWIG_BLOCK_MAGIC2(lfast, CC2F2ByteVector);
 GR_SWIG_BLOCK_MAGIC2(lfast, nlog10volk);
 %include "lfast/quad_demod_volk.h"
 GR_SWIG_BLOCK_MAGIC2(lfast, quad_demod_volk);
+%include "lfast/MTFIRFilterCCF.h"
+GR_SWIG_BLOCK_MAGIC2(lfast, MTFIRFilterCCF);
+%include "lfast/MTFIRFilterFF.h"
+GR_SWIG_BLOCK_MAGIC2(lfast, MTFIRFilterFF);
+%include "lfast/MTFIRFilterCCC.h"
+GR_SWIG_BLOCK_MAGIC2(lfast, MTFIRFilterCCC);

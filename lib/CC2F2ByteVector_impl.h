@@ -22,6 +22,9 @@
 #define INCLUDED_TESTTIMING_CC2F2BYTEVECTOR_IMPL_H
 
 #include <lfast/CC2F2ByteVector.h>
+#include <boost/thread/thread.hpp>
+
+#define LF_MAX_THREADS 8
 
 namespace gr {
   namespace lfast {
@@ -29,14 +32,30 @@ namespace gr {
     class CC2F2ByteVector_impl : public CC2F2ByteVector
     {
     protected:
-    	int d_scale;
-    	int d_vlen;
+		int d_scale;
+		int d_vlen;
 
-	  float min_val = -128;
-	  float max_val = 127;
+		boost::thread *threads[LF_MAX_THREADS];
+		bool dataReady[LF_MAX_THREADS];
+		long threadBlockSize[LF_MAX_THREADS];
+		long startIndex[LF_MAX_THREADS];
+		const gr_complex *inBuffer;
+		char *outBuffer;
 
-	  float *floatBuff = NULL;
-	  int curBufferSize=0;
+		unsigned concurentThreadsSupported;
+		unsigned concurrentMinus1;
+
+		bool stopThreads;
+
+        boost::mutex d_mutex;
+
+		float min_val = -128;
+		float max_val = 127;
+
+		float *floatBuff = NULL;
+		int curBufferSize=0;
+
+		void processItems(int threadIndex);
 
      public:
       CC2F2ByteVector_impl(int scale,int vecLength,int numVecItems);
