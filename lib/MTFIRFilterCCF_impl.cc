@@ -713,12 +713,15 @@ namespace gr {
 
         d_ndecimation = decimation;
         // try to make sure we don't get like 20 samples:
+        /*
         int minMultiple = d_fir->ntaps()*nthreads;
 
         if (minMultiple % 2 != 0)
         	minMultiple += 1;
 
         gr::block::set_output_multiple(minMultiple);
+        */
+        gr::block::set_output_multiple(2048*nthreads);
     }
 
     /*
