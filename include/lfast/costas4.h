@@ -49,7 +49,7 @@ namespace gr {
        * class. lfast::costas2::make is the public interface for
        * creating new instances.
        */
-      static sptr make(float loop_bw, int order);
+      static sptr make(float loop_bw, int order, bool genPDUs);
 
       virtual float error() const = 0;
     };

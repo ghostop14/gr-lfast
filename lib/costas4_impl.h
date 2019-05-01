@@ -32,6 +32,7 @@ namespace gr {
        int d_order;
        float d_error;
        float d_noise;
+       bool d_genSignalPDUs;
 
        float
        phase_detector_2(gr_complex sample) const
@@ -50,10 +51,12 @@ namespace gr {
        float (costas4_impl::*d_phase_detector)(gr_complex sample) const;
 
      public:
-      costas4_impl(float loop_bw, int order);
+      costas4_impl(float loop_bw, int order, bool genPDUs);
       ~costas4_impl();
 
       float error() const;
+
+      void handleMsgIn(pmt::pmt_t msg);
 
       // void printSineError();
 

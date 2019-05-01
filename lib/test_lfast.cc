@@ -537,7 +537,7 @@ void timeCostasLoop2() {
 	std::cout << "Testing 2nd order Costas Loop with " << localblocksize << " samples..." << std::endl;
 
 	costas2_impl *test;
-	test = new costas2_impl(0.00199,2);
+	test = new costas2_impl(0.00199,2,false);
 
 	int i;
 	std::chrono::time_point<std::chrono::steady_clock> start, end;
@@ -618,7 +618,7 @@ void timeCostasLoop4() {
 	std::cout << "Testing 4th order Costas Loop with " << localblocksize << " samples..." << std::endl;
 
 	costas4_impl *test;
-	test = new costas4_impl(0.00199,2);
+	test = new costas4_impl(0.00199,2,false);
 
 	int i;
 	std::chrono::time_point<std::chrono::steady_clock> start, end;

@@ -57,22 +57,24 @@ namespace gr {
   namespace lfast {
 
     costas2::sptr
-    costas2::make(float loop_bw, int order)
+    costas2::make(float loop_bw, int order, bool genPDUs)
     {
       return gnuradio::get_initial_sptr
-        (new costas2_impl(loop_bw, order));
+        (new costas2_impl(loop_bw, order, genPDUs));
     }
 
     /*
      * The private constructor
      */
-    costas2_impl::costas2_impl(float loop_bw, int order)
+    costas2_impl::costas2_impl(float loop_bw, int order, bool genPDUs)
       : gr::sync_block("costas2",
               gr::io_signature::make(1, 1, sizeof(gr_complex)),
               gr::io_signature::make(1, 1, sizeof(gr_complex))),
 			  blocks::control_loop(loop_bw, 1.0, -1.0),
 			  d_order(order), d_error(0), d_noise(1.0), d_phase_detector(NULL)
     {
+    	d_genSignalPDUs = genPDUs;
+
     	// Only set up for 2nd order right now.
         d_phase_detector = &costas2_impl::phase_detector_2;
 /*
@@ -82,6 +84,10 @@ namespace gr {
           boost::bind(&costas2_impl::handle_set_noise,
                       this, _1));
 */
+		message_port_register_in(pmt::mp("msgin"));
+        set_msg_handler(pmt::mp("msgin"), boost::bind(&costas2_impl::handleMsgIn, this, _1) );
+
+        message_port_register_out(pmt::mp("msgout"));
     }
 
     /*
@@ -173,6 +179,30 @@ namespace gr {
       }
 
       return noutput_items;
+    }
+
+    void costas2_impl::handleMsgIn(pmt::pmt_t msg) {
+    	if (!d_genSignalPDUs)
+    		return;
+
+		pmt::pmt_t inputMetadata = pmt::car(msg);
+		pmt::pmt_t data = pmt::cdr(msg);
+		size_t noutput_items = pmt::length(data);
+		const gr_complex *cc_samples;
+
+		cc_samples = pmt::c32vector_elements(data,noutput_items);
+
+		gr_complex out[noutput_items];
+		std::vector<const void *> items_in;
+		std::vector<void *> items_out;
+		items_out.push_back(&out[0]);
+		items_in.push_back(&cc_samples[0]);
+
+		int retVal = work_test(noutput_items,items_in,items_out);
+
+		pmt::pmt_t data_out(pmt::init_c32vector(noutput_items, &out[0]));
+		pmt::pmt_t pdu = pmt::cons( inputMetadata, data_out );
+		message_port_pub(pmt::mp("msgout"),pdu);
     }
 
     int
@@ -441,6 +471,13 @@ namespace gr {
 		frequency_limit();
          */
 
+        }
+
+        if (d_genSignalPDUs) {
+            pmt::pmt_t meta = pmt::make_dict();
+    		pmt::pmt_t data_out(pmt::init_c32vector(noutput_items, (gr_complex *)optr));
+    		pmt::pmt_t pdu = pmt::cons( meta, data_out );
+    		message_port_pub(pmt::mp("msgout"),pdu);
         }
 
         return noutput_items;
