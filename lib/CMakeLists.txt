@@ -64,7 +64,7 @@ ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 include(GrPlatform) #define LIB_SUFFIX
 
 include_directories(${Boost_INCLUDE_DIR})
-link_directories(${Boost_LIBRARY_DIRS})
+link_directories(${Boost_LIBRARY_DIRS} pthread)
 
 list(APPEND lfast_sources
     costas2_impl.cc
@@ -141,6 +141,7 @@ target_link_libraries(
   thrift
   volk
   gnuradio-lfast
+  pthread
 )
 
 install(TARGETS test-lfast DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" RUNTIME)
