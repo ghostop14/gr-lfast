@@ -89,7 +89,7 @@ endif(NOT lfast_sources)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfma4")
 
 add_library(gnuradio-lfast SHARED ${lfast_sources})
-target_link_libraries(gnuradio-lfast ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES} boost_thread gnuradio-blocks gnuradio-filter volk thrift
+target_link_libraries(gnuradio-lfast ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES} boost_thread gnuradio-blocks gnuradio-filter volk
 )
 set_target_properties(gnuradio-lfast PROPERTIES DEFINE_SYMBOL "gnuradio_lfast_EXPORTS")
 
@@ -138,7 +138,6 @@ target_link_libraries(
   ${CPPUNIT_LIBRARIES}
   gnuradio-blocks
   gnuradio-filter
-  thrift
   volk
   gnuradio-lfast
   pthread
