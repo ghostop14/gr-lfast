@@ -698,8 +698,8 @@ namespace gr {
      */
     nlog10volk_impl::nlog10volk_impl(float n, size_t vlen, float k)
       : gr::sync_block("nlog10volk",
-              gr::io_signature::make(1, 1, sizeof(float)),
-              gr::io_signature::make(1, 1, sizeof(float)))
+              gr::io_signature::make(1, 1, sizeof(float)*vlen),
+              gr::io_signature::make(1, 1, sizeof(float)*vlen))
     {
     	// This is both the n multiplier and a fixed log2 term to convert from the volk
     	// log2 call to log10 based on the way logs work.
