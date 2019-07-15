@@ -18,6 +18,7 @@
 # Boston, MA 02110-1301, USA.
 
 install(FILES
+	lfast_freq_shift.xml
     lfast_costas2.xml
     lfast_costas4.xml
     lfast_agc_fast.xml
