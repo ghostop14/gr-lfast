@@ -18,20 +18,20 @@
 # Boston, MA 02110-1301, USA.
 
 install(FILES
-	lfast_freq_shift.xml
-    lfast_costas2.xml
-    lfast_costas4.xml
-    lfast_agc_fast.xml
-    lfast_agc_fast_ff.xml
-    lfast_CC2F2ByteVector.xml
-    lfast_low_pass_filter.xml
-    lfast_high_pass_filter.xml
-    lfast_root_raised_cosine_filter.xml
-    lfast_nlog10volk.xml
-    lfast_MTFIRLowPassFilterXX.xml
-    lfast_MTFIRFilterXX.xml
+	lfast_freq_shift.block.yml
+    lfast_costas2.block.yml
+    lfast_costas4.block.yml
+    lfast_agc_fast.block.yml
+    lfast_agc_fast_ff.block.yml
+    lfast_CC2F2ByteVector.block.yml
+    lfast_low_pass_filter.block.yml
+    lfast_high_pass_filter.block.yml
+    lfast_root_raised_cosine_filter.block.yml
+    lfast_nlog10volk.block.yml
+    lfast_MTFIRLowPassFilterXX.block.yml
+    lfast_MTFIRFilterXX.block.yml
     DESTINATION share/gnuradio/grc/blocks
     
 )
 
-# lfast_quad_demod_volk.xml 
+# lfast_quad_demod_volk.block.yml 

@@ -24,11 +24,6 @@
 #include "config.h"
 #endif
 
-#include <cppunit/TextTestRunner.h>
-#include <cppunit/XmlOutputter.h>
-
-#include <gnuradio/unittests.h>
-#include "qa_lfast.h"
 #include <iostream>
 #include <fstream>
 #include <iomanip>

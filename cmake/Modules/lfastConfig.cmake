@@ -22,9 +22,10 @@ FIND_LIBRARY(
           /usr/local/lib64
           /usr/lib
           /usr/lib64
-)
+          )
+
+include("${CMAKE_CURRENT_LIST_DIR}/lfastTarget.cmake")
 
 INCLUDE(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(LFAST DEFAULT_MSG LFAST_LIBRARIES LFAST_INCLUDE_DIRS)
 MARK_AS_ADVANCED(LFAST_LIBRARIES LFAST_INCLUDE_DIRS)
-

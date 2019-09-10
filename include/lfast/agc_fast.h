@@ -24,7 +24,7 @@
 
 #include <lfast/api.h>
 #include <gnuradio/sync_block.h>
-#include "agc.h"
+#include <lfast/agc.h>
 
 namespace gr {
   namespace lfast {

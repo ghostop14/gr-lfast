@@ -483,36 +483,6 @@ namespace gr {
         return noutput_items;
     }
 
-    void
-    costas2_impl::setup_rpc()
-    {
-#ifdef GR_CTRLPORT
-      // Getters
-        rpcbasic_sptr(new rpcbasic_register_get<costas2_cc, float>(
-	      alias(), "error",
-	      &costas_loop_cc::error,
-	      pmt::mp(-2.0f), pmt::mp(2.0f), pmt::mp(0.0f),
-	      "", "Error signal of loop", RPC_PRIVLVL_MIN,
-            DISPTIME | DISPOPTSTRIP)));
-      add_rpc_variable(
-          rpcbasic_sptr(new rpcbasic_register_get<control_loop, float>(
-	      alias(), "loop_bw",
-	      &control_loop::get_loop_bandwidth,
-	      pmt::mp(0.0f), pmt::mp(2.0f), pmt::mp(0.0f),
-	      "", "Loop bandwidth", RPC_PRIVLVL_MIN,
-              DISPTIME | DISPOPTSTRIP)));
-
-      // Setters
-      add_rpc_variable(
-          rpcbasic_sptr(new rpcbasic_register_set<control_loop, float>(
-	      alias(), "loop_bw",
-	      &control_loop::set_loop_bandwidth,
-	      pmt::mp(0.0f), pmt::mp(1.0f), pmt::mp(0.0f),
-	      "", "Loop bandwidth",
-	      RPC_PRIVLVL_MIN, DISPNULL)));
-#endif /* GR_CTRLPORT */
-    }
-
   } /* namespace lfast */
 } /* namespace gr */
 

@@ -55,8 +55,6 @@ namespace gr {
 
       void handleMsgIn(pmt::pmt_t msg);
 
-      void setup_rpc();
-
       // Where all the action really happens
       int work(int noutput_items,
          gr_vector_const_void_star &input_items,
