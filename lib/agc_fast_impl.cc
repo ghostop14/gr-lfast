@@ -25,6 +25,7 @@
 #include <gnuradio/io_signature.h>
 #include "agc_fast_impl.h"
 #include <volk/volk.h>
+#include "scomplex.h"
 
 // assisted detection of Fused Multiply Add (FMA) functionality
 #if !defined(__FMA__) && defined(__AVX2__)
@@ -89,6 +90,7 @@ namespace gr {
     {
       const gr_complex *in = (const gr_complex*)input_items[0];
       gr_complex *out = (gr_complex*)output_items[0];
+      StructComplex *sOut = (StructComplex*)output_items[0];
 
       float o_i,o_r;
 /*
@@ -105,8 +107,8 @@ namespace gr {
     	  out[i] = in[i] * _gain;
 
     	  // save on the first, n*scale, and n*(.imag() and .real()) function jumps
-    	  o_i = out[i].imag();
-    	  o_r = out[i].real();
+    	  o_i = sOut[i].imag;
+    	  o_r = sOut[i].real;
 
     	  // See https://www.codeproject.com/Articles/69941/Best-Square-Root-Method-Algorithm-Function-Precisi
     	  // for faster square root examples.
@@ -142,6 +144,7 @@ namespace gr {
     {
         const gr_complex *in = (const gr_complex*)input_items[0];
         gr_complex *out = (gr_complex*)output_items[0];
+        StructComplex *sOut = (StructComplex*)output_items[0];
 
         float o_i,o_r;
   /*
@@ -158,8 +161,8 @@ namespace gr {
       	  out[i] = in[i] * _gain;
 
       	  // save on the first, n*scale, and n*(.imag() and .real()) function jumps
-      	  o_i = out[i].imag();
-      	  o_r = out[i].real();
+      	  o_i = sOut[i].imag;
+      	  o_r = sOut[i].real;
 
       	  // See https://www.codeproject.com/Articles/69941/Best-Square-Root-Method-Algorithm-Function-Precisi
       	  // for faster square root examples.
