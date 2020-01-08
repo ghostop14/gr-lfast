@@ -57,7 +57,7 @@ and multiple threads.  Overall speedup on that block was nominal, 2-3%.
 
 Note there is a significant speed increase in log calculations with some math refactoring to take advantage of a volk log2 function to calculate the log10 (n*log10(x) = n*log10(x) as n*log2(x)/log2(10) = (n/log2(10)) * log2(x)).  This resulted in a 350% speed increase.
 
-FIR filters were also optimized to take advantage of multi-threading.  The test-lfast tool can be used as shown below to determine the optimal number of threads given your CPU and number of taps.  Generall 3-4 threads is a good place to be.
+FIR filters were also optimized to take advantage of multi-threading.  The test-lfast tool can be used as shown below to determine the optimal number of threads given your CPU and number of taps.  Generally 3-4 threads is a good place to be.
 
 The plan is to add more blocks as I run into needing them.
 
