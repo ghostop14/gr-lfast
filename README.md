@@ -18,8 +18,8 @@ The goal of the gr-lfast project is to increase flowgraph performance while runn
 5.  FFT-based Root Raised Cosine Filter Convenience Wrapper
 6.  Aggregated block that does Complex to Real->Byte->Vector in a single C++ implementation
 
-**New** 7.  n*log10(x) + k implemented with Volk
-**New** 8.  Multi-threaded FIR filters
+7.  Log Block (n*log10(x) + k) implemented with Volk [Note that as of GNU Radio 3.8, the volk approach is now in the standard block]
+8.  Multi-threaded FIR filters
 
 ## Command-line tools
 
@@ -50,7 +50,7 @@ In terms of code optimization, gr-lfast focuses on using basic C++ code optimiza
 For instance the native 2nd order Costas Loop module running on an i7-6700 clocked at processing about 22.2 Msps.  After optimizing the code
 the 2nd order loop was capable of processing almost 38 Msps (a 71% speed increase).  A 4th order loop went from about 21.8 Msps to almost 33 Msps (a 50.6% improvement).  
   
-The same approach was applied to the AGC block for about a 12% speed increase from 91 MSPS to about 102.7 MSPS.  
+The same approach was applied to the AGC block for about a 17-20% speed increase to about 104 MSPS.  
 
 The block Complex->Real->Char->Vector combines Complex->Real, Float->char, and stream->Vector in a single block, saving on buffer copies 
 and multiple threads.  Overall speedup on that block was nominal, 2-3%.  
@@ -64,54 +64,60 @@ The plan is to add more blocks as I run into needing them.
 The following output from running 'test-lfast' shows the speed increases on a newer laptop with an Intel i7-7700HQ 7th Gen processor.
 
 Testing 2nd order Costas Loop with 8,192 samples...
-Original Code Run Time:      0.000571 s  (14,340,659.000000 sps)
-LFAST Code Run Time:      0.000271 s  (30,281,824.000000 sps)
-Speedup:        111.16% faster
+Original Code Run Time:      0.000544 s  (15,054,931.000000 sps)
+LFAST Code Run Time:      0.000202 s  (40,552,132.000000 sps)
+Speedup:        169.36% faster
 
 Testing 4th order Costas Loop with 8,192 samples...
-Original Code Run Time:      0.000531 s  (15,418,123.000000 sps)
-LFAST Code Run Time:      0.000315 s  (26,030,892.000000 sps)
-Speedup:         68.83% faster
+Original Code Run Time:      0.000373 s  (21,946,850.000000 sps)
+LFAST Code Run Time:      0.000240 s  (34,098,004.000000 sps)
+Speedup:         55.37% faster
 
 ----------------------------------------------------------
 Testing AGC with 8,192 samples...
-Original Code Run Time:      0.000157 s  (52,168,060.000000 sps)
-LFAST Code Run Time:      0.000143 s  (57,258,728.000000 sps)
-Speedup:          9.76% faster
+Original Code Run Time:      0.000093 s  (87,887,608.000000 sps)
+LFAST Code Run Time:      0.000075 s  (109,181,128.000000 sps)
+Speedup:         24.23% faster
+
+----------------------------------------------------------
+Testing Complex->Real->Char->Vector with 8,192 samples...
+Original Code Run Time:      0.000007 s  (1,207,321,088.000000 sps)
+LFAST Code Run Time:      0.000007 s  (1,242,644,864.000000 sps)
+Speedup:          2.93% faster
 
 ----------------------------------------------------------
 Testing volk nlog10+k with 8,192 samples...
-Original Code Run Time:      0.000175 s  (46,798,640.000000 sps)
-LFAST Code Run Time:      0.000039 s  (209,097,200.000000 sps)
-Speedup:        346.80% faster
+Original Code Run Time:      0.000135 s  (60,607,308.000000 sps)
+LFAST Code Run Time:      0.000041 s  (199,728,688.000000 sps)
+Speedup:        229.55% faster
 
 ----------------------------------------------------------
 Testing FIR filter with complex data and float taps with 241 taps, 8,192 samples...
-Original Code Run Time:      0.000456 s  (17,961,178.000000 sps)
-LFAST Code Run Time [1 threads]:      0.000487 s  (16,833,790.000000 sps)
-1-thread Speedup:         -6.28% faster
-LFAST Code Run Time [2 threads]:      0.000283 s  (28,978,810.000000 sps)
-2-thread Speedup:         61.34% faster
-LFAST Code Run Time [3 threads]:      0.000232 s  (35,335,860.000000 sps)
-3-thread Speedup:         96.73% faster
-LFAST Code Run Time [4 threads]:      0.000198 s  (41,386,656.000000 sps)
-4-thread Speedup:        130.42% faster
-LFAST Code Run Time [5 threads]:      0.000265 s  (30,883,978.000000 sps)
-5-thread Speedup:         71.95% faster
-LFAST Code Run Time [6 threads]:      0.000299 s  (27,423,570.000000 sps)
-6-thread Speedup:         52.68% faster
-LFAST Code Run Time [7 threads]:      0.000267 s  (30,719,422.000000 sps)
-7-thread Speedup:         71.03% faster
-LFAST Code Run Time [8 threads]:      0.000342 s  (23,955,840.000000 sps)
-8-thread Speedup:         33.38% faster
+Original Code Run Time:      0.000447 s  (18,344,648.000000 sps)
+LFAST Code Run Time [1 threads]:      0.000646 s  (12,673,606.000000 sps)
+1-thread Speedup:        -30.91% faster
+LFAST Code Run Time [2 threads]:      0.000287 s  (28,563,974.000000 sps)
+2-thread Speedup:         55.71% faster
+LFAST Code Run Time [3 threads]:      0.000294 s  (27,822,952.000000 sps)
+3-thread Speedup:         51.67% faster
+LFAST Code Run Time [4 threads]:      0.000268 s  (30,516,536.000000 sps)
+4-thread Speedup:         66.35% faster
+LFAST Code Run Time [5 threads]:      0.000347 s  (23,585,654.000000 sps)
+5-thread Speedup:         28.57% faster
+LFAST Code Run Time [6 threads]:      0.000291 s  (28,183,880.000000 sps)
+6-thread Speedup:         53.64% faster
+LFAST Code Run Time [7 threads]:      0.000386 s  (21,199,370.000000 sps)
+7-thread Speedup:         15.56% faster
+LFAST Code Run Time [8 threads]:      0.000339 s  (24,150,214.000000 sps)
+8-thread Speedup:         31.65% faster
 
 Fastest filter thread performance:
 Number of Samples in test case (can be varied with command-line parameter): 8,192
 Number of taps in filter (can be varied with command-line parameter): 241
 Fastest Thread Count: 4
-Original SPS: 17,961,178.00
-Fastest SPS: 41,386,656.00
-Speedup: 130.42% faster
+Original SPS: 18,344,648.00
+Fastest SPS: 30,516,536.00
+Speedup: 66.35% faster
 
 
 
