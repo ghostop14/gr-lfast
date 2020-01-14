@@ -13,12 +13,12 @@ parameters:
     label: Vector length
     dtype: int
     default: '1'
-    hide: ${ 'part' if vlen == 1 else 'none' }
+    hide: ${ 'part' if vecLength == 1 else 'none' }
 -   id: num_items
     label: Num Items
     dtype: int
     default: '2'
-    hide: ${ 'part' if vlen == 1 else 'none' }
+    hide: ${ 'part' if vecLength == 1 else 'none' }
 
 inputs:
 -   domain: stream
