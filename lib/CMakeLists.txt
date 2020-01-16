@@ -18,35 +18,35 @@
 # the Free Software Foundation, Inc., 51 Franklin Street,
 # Boston, MA 02110-1301, USA.
 
-########################################################################
 # Setup FMA Capabilities Flag
-########################################################################
 IF(UNIX)
-	IF(NOT APPLE)
-    	MESSAGE(STATUS "Detected Linux OS")
-		EXEC_PROGRAM(cat ARGS "/proc/cpuinfo" OUTPUT_VARIABLE CPUINFO)
-	ELSE(NOT APPLE)
-    	MESSAGE(STATUS "Detected Apple OS")
-		EXEC_PROGRAM("/usr/sbin/sysctl -n machdep.cpu.features" OUTPUT_VARIABLE CPUINFO)
-	ENDIF(NOT APPLE)
-	
-	STRING(REGEX REPLACE "^.*(fma).*$" "fma" FMA_THERE ${CPUINFO})
-   STRING(COMPARE EQUAL "fma" "${FMA_THERE}" FMA_TRUE)
-   IF (FMA_TRUE)
-		MESSAGE(STATUS "Found FMA.  Setting fma compile flag.")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfma")
-   ELSE (FMA_TRUE)
-		MESSAGE(STATUS "Not using FMA")
-	ENDIF (FMA_TRUE)
-ELSE()
-    MESSAGE(STATUS "OS is not linux.  Not setting FMA flags.")
+    MESSAGE(STATUS "Checking for FMA support...")
+    IF(APPLE)
+        EXEC_PROGRAM("/usr/sbin/sysctl -n machdep.cpu.features" OUTPUT_VARIABLE CPUINFO)
+    ELSE(APPLE)
+        if(EXISTS "/proc/cpuinfo")
+            EXEC_PROGRAM(cat ARGS "/proc/cpuinfo" OUTPUT_VARIABLE CPUINFO)
+        ELSE()
+            # If for any reason /proc/cpuinfo does not exist, default to no FMA.
+            set(CPUINFO "")
+        ENDIF()
+    ENDIF(APPLE)
+
+    STRING(REGEX REPLACE "^.*(fma).*$" "fma" FMA_THERE ${CPUINFO})
+    STRING(COMPARE EQUAL "fma" "${FMA_THERE}" FMA_TRUE)
+    IF (FMA_TRUE)
+                MESSAGE(STATUS "Found FMA support.  Setting fma compile flag.")
+                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfma")
+    ELSE (FMA_TRUE)
+                MESSAGE(STATUS "FMA support not found.  Not setting fma flag.")
+    ENDIF (FMA_TRUE)
 ENDIF()
 
 IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 	MESSAGE(STATUS "building for debug...")
 ELSE(CMAKE_BUILD_TYPE MATCHES RELEASE)
 	MESSAGE(STATUS "Release mode: increasing compiler optimizations...")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 
 ########################################################################
