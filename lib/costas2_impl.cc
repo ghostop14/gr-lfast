@@ -47,11 +47,13 @@
 #define __FMA__ 1
 #endif
 
+/*
 #if defined(__FMA__)
 #pragma message "FMA support detected.  Compiling for Fused Multiply/Add support."
 #else
 #pragma message "No FMA support detected.  Compiling for normal math."
 #endif
+*/
 
 namespace gr {
   namespace lfast {
