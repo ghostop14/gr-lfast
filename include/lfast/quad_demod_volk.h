@@ -693,7 +693,7 @@ namespace gr {
     class LFAST_API quad_demod_volk : virtual public gr::sync_block
     {
      public:
-      typedef boost::shared_ptr<quad_demod_volk> sptr;
+      typedef std::shared_ptr<quad_demod_volk> sptr;
 
       /*!
        * \brief Return a shared_ptr to a new instance of lfast::quad_demod_volk.

@@ -36,7 +36,7 @@ namespace gr {
     class LFAST_API CC2F2ByteVector : virtual public gr::sync_decimator
     {
      public:
-      typedef boost::shared_ptr<CC2F2ByteVector> sptr;
+      typedef std::shared_ptr<CC2F2ByteVector> sptr;
 
       /*!
        * \brief Return a shared_ptr to a new instance of testtiming::CC2F2ByteVector.

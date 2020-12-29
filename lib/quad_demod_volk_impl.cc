@@ -675,10 +675,6 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <gnuradio/io_signature.h>
 #include "quad_demod_volk_impl.h"
 #include <volk/volk.h>
@@ -688,93 +684,91 @@
  */
 
 namespace gr {
-  namespace lfast {
+namespace lfast {
 
-    quad_demod_volk::sptr
-    quad_demod_volk::make(float gain)
-    {
-      return gnuradio::get_initial_sptr
-        (new quad_demod_volk_impl(gain));
-    }
+quad_demod_volk::sptr quad_demod_volk::make(float gain)
+{
+	return gnuradio::make_block_sptr<quad_demod_volk_impl>(gain);
+}
 
-    /*
-     * The private constructor
-     */
-    quad_demod_volk_impl::quad_demod_volk_impl(float gain)
-      : gr::sync_block("quad_demod_volk",
-              gr::io_signature::make(1, 1, sizeof(gr_complex)),
-              gr::io_signature::make(1, 1, sizeof(float)))
-    {
-    	d_gain = gain;
-    	d_inv_gain = 1.0 / gain;  // Pre-calc.  Volk wants to divide by scale factor so need to invert it to get the multiply
+/*
+ * The private constructor
+ */
+quad_demod_volk_impl::quad_demod_volk_impl(float gain)
+: gr::sync_block("quad_demod_volk",
+		gr::io_signature::make(1, 1, sizeof(gr_complex)),
+		gr::io_signature::make(1, 1, sizeof(float)))
+{
+	d_gain = gain;
+	d_inv_gain = 1.0 / gain;  // Pre-calc.  Volk wants to divide by scale factor so need to invert it to get the multiply
 
 
-        const int alignment_multiple = volk_get_alignment() / sizeof(gr_complex);
-        set_alignment(std::max(1, alignment_multiple));
+	const int alignment_multiple = volk_get_alignment() / sizeof(gr_complex);
+	set_alignment(std::max(1, alignment_multiple));
 
-        set_history(2); // we need to look at the previous value
-    }
+	set_history(2); // we need to look at the previous value
+}
 
-    /*
-     * Our virtual destructor.
-     */
-    quad_demod_volk_impl::~quad_demod_volk_impl()
-    {
-    }
+/*
+ * Our virtual destructor.
+ */
+quad_demod_volk_impl::~quad_demod_volk_impl()
+{
+}
 
-    int
-    quad_demod_volk_impl::work_original(int noutput_items,
-        gr_vector_const_void_star &input_items,
-        gr_vector_void_star &output_items)
-    {
-        gr_complex *in = (gr_complex*)input_items[0];
-        float *out = (float*)output_items[0];
+int
+quad_demod_volk_impl::work_original(int noutput_items,
+		gr_vector_const_void_star &input_items,
+		gr_vector_void_star &output_items)
+{
+	gr_complex *in = (gr_complex*)input_items[0];
+	float *out = (float*)output_items[0];
 
-        std::vector<gr_complex> tmp(noutput_items);
-        volk_32fc_x2_multiply_conjugate_32fc(&tmp[0], &in[1], &in[0], noutput_items);
-        for(int i = 0; i < noutput_items; i++) {
-          out[i] = d_gain * gr::fast_atan2f(imag(tmp[i]), real(tmp[i]));
-        }
+	std::vector<gr_complex> tmp(noutput_items);
+	volk_32fc_x2_multiply_conjugate_32fc(&tmp[0], &in[1], &in[0], noutput_items);
+	for(int i = 0; i < noutput_items; i++) {
+		out[i] = d_gain * gr::fast_atan2f(imag(tmp[i]), real(tmp[i]));
+	}
 
-        return noutput_items;
-    }
+	return noutput_items;
+}
 
-    int
-    quad_demod_volk_impl::work_test(int noutput_items,
-        gr_vector_const_void_star &input_items,
-        gr_vector_void_star &output_items)
-    {
-        gr_complex *in = (gr_complex*)input_items[0];
-        float *out = (float*)output_items[0];
+int
+quad_demod_volk_impl::work_test(int noutput_items,
+		gr_vector_const_void_star &input_items,
+		gr_vector_void_star &output_items)
+{
+	gr_complex *in = (gr_complex*)input_items[0];
+	float *out = (float*)output_items[0];
 
-        std::vector<gr_complex> tmp(noutput_items);
-        volk_32fc_x2_multiply_conjugate_32fc(&tmp[0], &in[1], &in[0], noutput_items);
+	std::vector<gr_complex> tmp(noutput_items);
+	volk_32fc_x2_multiply_conjugate_32fc(&tmp[0], &in[1], &in[0], noutput_items);
 
-        volk_32fc_s32f_atan2_32f(&out[0],&tmp[0],d_inv_gain,noutput_items);
+	volk_32fc_s32f_atan2_32f(&out[0],&tmp[0],d_inv_gain,noutput_items);
 
-        return noutput_items;
-    }
+	return noutput_items;
+}
 
-    int
-    quad_demod_volk_impl::work(int noutput_items,
-        gr_vector_const_void_star &input_items,
-        gr_vector_void_star &output_items)
-    {
-    	// return work_original(noutput_items,input_items,output_items);
+int
+quad_demod_volk_impl::work(int noutput_items,
+		gr_vector_const_void_star &input_items,
+		gr_vector_void_star &output_items)
+{
+	// return work_original(noutput_items,input_items,output_items);
 
-        gr_complex *in = (gr_complex*)input_items[0];
-        float *out = (float*)output_items[0];
+	gr_complex *in = (gr_complex*)input_items[0];
+	float *out = (float*)output_items[0];
 
-        std::vector<gr_complex> tmp(noutput_items);
-        volk_32fc_x2_multiply_conjugate_32fc(&tmp[0], &in[1], &in[0], noutput_items);
+	std::vector<gr_complex> tmp(noutput_items);
+	volk_32fc_x2_multiply_conjugate_32fc(&tmp[0], &in[1], &in[0], noutput_items);
 
-        volk_32fc_s32f_atan2_32f(&out[0],&tmp[0],d_inv_gain,noutput_items);
-        //volk_32fc_s32f_atan2_32f(&out[0],&tmp[0],1.0,noutput_items);
-		//volk_32f_s32f_multiply_32f(out,out,d_gain,noutput_items);
+	volk_32fc_s32f_atan2_32f(&out[0],&tmp[0],d_inv_gain,noutput_items);
+	//volk_32fc_s32f_atan2_32f(&out[0],&tmp[0],1.0,noutput_items);
+	//volk_32f_s32f_multiply_32f(out,out,d_gain,noutput_items);
 
-        return noutput_items;
-    }
+	return noutput_items;
+}
 
-  } /* namespace lfast */
+} /* namespace lfast */
 } /* namespace gr */
 

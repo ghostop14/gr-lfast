@@ -36,7 +36,7 @@ namespace gr {
     class LFAST_API agc_fast_ff : virtual public gr::sync_block
     {
      public:
-      typedef boost::shared_ptr<agc_fast_ff> sptr;
+      typedef std::shared_ptr<agc_fast_ff> sptr;
 
       /*!
        * \brief Return a shared_ptr to a new instance of lfast::agc_fast.

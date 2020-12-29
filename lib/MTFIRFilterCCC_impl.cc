@@ -675,153 +675,148 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <gnuradio/io_signature.h>
 #include "MTFIRFilterCCC_impl.h"
 
 namespace gr {
-  namespace lfast {
+namespace lfast {
 
-    MTFIRFilterCCC::sptr
-    MTFIRFilterCCC::make(int decimation, const std::vector<gr_complex> &taps, int nthreads)
-    {
-      return gnuradio::get_initial_sptr
-        (new MTFIRFilterCCC_impl(decimation, taps, nthreads));
-    }
+MTFIRFilterCCC::sptr
+MTFIRFilterCCC::make(int decimation, const std::vector<gr_complex>& taps, int nthreads)
+{
+	return gnuradio::make_block_sptr<MTFIRFilterCCC_impl>(decimation, taps, nthreads);
+}
 
-    /*
-     * The private constructor
-     */
-    MTFIRFilterCCC_impl::MTFIRFilterCCC_impl(int decimation, const std::vector<gr_complex> &taps, int nthreads)
-      : gr::sync_decimator("MTFIRFilterCCC",
-              gr::io_signature::make(1, 1, sizeof(gr_complex)),
-              gr::io_signature::make(1, 1, sizeof(gr_complex)), decimation)
-    {
-        // d_fir = new gr::filter::kernel::fir_filter_ccf(decimation, taps);
-    	d_fir_original = new gr::filter::kernel::fir_filter_ccc(decimation, taps);
-        d_fir = new gr::lfast::FIRFilterCCC_MT(taps,nthreads);
-        d_updated = false;
-        set_history(d_fir->ntaps());
+/*
+ * The private constructor
+ */
+MTFIRFilterCCC_impl::MTFIRFilterCCC_impl(int decimation, const std::vector<gr_complex> &taps, int nthreads)
+: gr::sync_decimator("MTFIRFilterCCC",
+		gr::io_signature::make(1, 1, sizeof(gr_complex)),
+		gr::io_signature::make(1, 1, sizeof(gr_complex)), decimation)
+{
+	// d_fir = new gr::filter::kernel::fir_filter_ccf(decimation, taps);
+	d_fir_original = new gr::filter::kernel::fir_filter_ccc(taps);
+	d_fir = new gr::lfast::FIRFilterCCC_MT(taps,nthreads);
+	d_updated = false;
+	set_history(d_fir->ntaps());
 
-        const int alignment_multiple =
-        volk_get_alignment() / sizeof(float);
-        set_alignment(std::max(1, alignment_multiple));
+	const int alignment_multiple =
+			volk_get_alignment() / sizeof(float);
+	set_alignment(std::max(1, alignment_multiple));
 
-        d_ndecimation = decimation;
+	d_ndecimation = decimation;
 
-        // try to make sure we don't get like 20 samples:
-        /*
+	// try to make sure we don't get like 20 samples:
+	/*
         int minMultiple = d_fir->ntaps()*nthreads;
 
         if (minMultiple % 2 != 0)
         	minMultiple += 1;
 
         gr::block::set_output_multiple(minMultiple);
-		*/
-        gr::block::set_output_multiple(2048*nthreads);
-    }
+	 */
+	gr::block::set_output_multiple(2048*nthreads);
+}
 
-    /*
-     * Our virtual destructor.
-     */
-    MTFIRFilterCCC_impl::~MTFIRFilterCCC_impl()
-    {
-    	stop();
-        delete d_fir;
-        delete d_fir_original;
-    }
+/*
+ * Our virtual destructor.
+ */
+MTFIRFilterCCC_impl::~MTFIRFilterCCC_impl()
+{
+	stop();
+	delete d_fir;
+	delete d_fir_original;
+}
 
-    bool MTFIRFilterCCC_impl::stop() {
-    	return true;
-    }
+bool MTFIRFilterCCC_impl::stop() {
+	return true;
+}
 
-    void
-	MTFIRFilterCCC_impl::set_taps(const std::vector<gr_complex> &taps)
-    {
-      gr::thread::scoped_lock l(d_setlock);
-      d_fir->set_taps(taps);
-      d_updated = true;
-    }
+void
+MTFIRFilterCCC_impl::set_taps(const std::vector<gr_complex> &taps)
+{
+	gr::thread::scoped_lock l(d_setlock);
+	d_fir->set_taps(taps);
+	d_updated = true;
+}
 
-    std::vector<gr_complex>
-    MTFIRFilterCCC_impl::taps() const
-    {
-      return d_fir->taps();
-    }
+std::vector<gr_complex>
+MTFIRFilterCCC_impl::taps() const
+{
+	return d_fir->taps();
+}
 
-    int
-	MTFIRFilterCCC_impl::work_original(int noutput_items,
-        gr_vector_const_void_star &input_items,
-        gr_vector_void_star &output_items)
-    {
-		gr::thread::scoped_lock l(d_setlock);
+int
+MTFIRFilterCCC_impl::work_original(int noutput_items,
+		gr_vector_const_void_star &input_items,
+		gr_vector_void_star &output_items)
+{
+	gr::thread::scoped_lock l(d_setlock);
 
-		const gr_complex *in = (const gr_complex *) input_items[0];
-		gr_complex *out = (gr_complex *) output_items[0];
+	const gr_complex *in = (const gr_complex *) input_items[0];
+	gr_complex *out = (gr_complex *) output_items[0];
 
-		if (d_ndecimation == 1) {
-		  d_fir_original->filterN(out, in, noutput_items);
-		}
-		else {
-		  d_fir_original->filterNdec(out, in, noutput_items, d_ndecimation);
-		}
+	if (d_ndecimation == 1) {
+		d_fir_original->filterN(out, in, noutput_items);
+	}
+	else {
+		d_fir_original->filterNdec(out, in, noutput_items, d_ndecimation);
+	}
 
-		// Tell runtime system how many output items we produced.
-		return noutput_items;
-    }
+	// Tell runtime system how many output items we produced.
+	return noutput_items;
+}
 
-    int
-	MTFIRFilterCCC_impl::work_test(int noutput_items,
-        gr_vector_const_void_star &input_items,
-        gr_vector_void_star &output_items)
-    {
-		gr::thread::scoped_lock l(d_setlock);
+int
+MTFIRFilterCCC_impl::work_test(int noutput_items,
+		gr_vector_const_void_star &input_items,
+		gr_vector_void_star &output_items)
+{
+	gr::thread::scoped_lock l(d_setlock);
 
-		const gr_complex *in = (const gr_complex *) input_items[0];
-		gr_complex *out = (gr_complex *) output_items[0];
+	const gr_complex *in = (const gr_complex *) input_items[0];
+	gr_complex *out = (gr_complex *) output_items[0];
 
-		if (d_ndecimation == 1) {
-		  d_fir->filterN(out, in, noutput_items);
-		}
-		else {
-		  d_fir->filterNdec(out, in, noutput_items, d_ndecimation);
-		}
+	if (d_ndecimation == 1) {
+		d_fir->filterN(out, in, noutput_items);
+	}
+	else {
+		d_fir->filterNdec(out, in, noutput_items, d_ndecimation);
+	}
 
-		// Tell runtime system how many output items we produced.
-		return noutput_items;
-    }
+	// Tell runtime system how many output items we produced.
+	return noutput_items;
+}
 
-    int
-	MTFIRFilterCCC_impl::work(int noutput_items,
-        gr_vector_const_void_star &input_items,
-        gr_vector_void_star &output_items)
-    {
-		gr::thread::scoped_lock l(d_setlock);
+int
+MTFIRFilterCCC_impl::work(int noutput_items,
+		gr_vector_const_void_star &input_items,
+		gr_vector_void_star &output_items)
+{
+	gr::thread::scoped_lock l(d_setlock);
 
-		if (d_updated) {
-			set_history(d_fir->ntaps());
-			d_updated = false;
-			return 0;	     // history requirements may have changed.
-		}
+	if (d_updated) {
+		set_history(d_fir->ntaps());
+		d_updated = false;
+		return 0;	     // history requirements may have changed.
+	}
 
-		const gr_complex *in = (const gr_complex *) input_items[0];
-		gr_complex *out = (gr_complex *) output_items[0];
+	const gr_complex *in = (const gr_complex *) input_items[0];
+	gr_complex *out = (gr_complex *) output_items[0];
 
-		if (d_ndecimation == 1) {
-		  d_fir->filterN(out, in, noutput_items);
-		}
-		else {
-		  d_fir->filterNdec(out, in, noutput_items, d_ndecimation);
-		}
+	if (d_ndecimation == 1) {
+		d_fir->filterN(out, in, noutput_items);
+	}
+	else {
+		d_fir->filterNdec(out, in, noutput_items, d_ndecimation);
+	}
 
-		// Tell runtime system how many output items we produced.
-		return noutput_items;
-    }
+	// Tell runtime system how many output items we produced.
+	return noutput_items;
+}
 
 
-  } /* namespace lfast */
+} /* namespace lfast */
 } /* namespace gr */
 

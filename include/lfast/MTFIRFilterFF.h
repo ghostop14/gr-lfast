@@ -693,7 +693,7 @@ namespace gr {
     class LFAST_API MTFIRFilterFF : virtual public gr::sync_decimator
     {
      public:
-      typedef boost::shared_ptr<MTFIRFilterFF> sptr;
+      typedef std::shared_ptr<MTFIRFilterFF> sptr;
 
       /*!
        * \brief Return a shared_ptr to a new instance of lfast::MTFIRFilterFF.

@@ -675,121 +675,115 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <gnuradio/io_signature.h>
 #include "nlog10volk_impl.h"
 #include <volk/volk.h>
 
 namespace gr {
-  namespace lfast {
+namespace lfast {
 
-    nlog10volk::sptr
-    nlog10volk::make(float n, size_t vlen, float k)
-    {
-      return gnuradio::get_initial_sptr
-        (new nlog10volk_impl(n, vlen, k));
-    }
+nlog10volk::sptr nlog10volk::make(float n, size_t vlen, float k)
+{
+	return gnuradio::make_block_sptr<nlog10volk_impl>(n, vlen, k);
+}
 
-    /*
-     * The private constructor
-     */
-    nlog10volk_impl::nlog10volk_impl(float n, size_t vlen, float k)
-      : gr::sync_block("nlog10volk",
-              gr::io_signature::make(1, 1, sizeof(float)*vlen),
-              gr::io_signature::make(1, 1, sizeof(float)*vlen))
-    {
-    	// This is both the n multiplier and a fixed log2 term to convert from the volk
-    	// log2 call to log10 based on the way logs work.
-    	// Pre-calc to save a calc in work
-		log2To10Factor = n / log2(10.0);
-		d_n = n;
-		d_vlen = vlen;
-		d_k=k;
+/*
+ * The private constructor
+ */
+nlog10volk_impl::nlog10volk_impl(float n, size_t vlen, float k)
+: gr::sync_block("nlog10volk",
+		gr::io_signature::make(1, 1, sizeof(float)*vlen),
+		gr::io_signature::make(1, 1, sizeof(float)*vlen))
+{
+	// This is both the n multiplier and a fixed log2 term to convert from the volk
+	// log2 call to log10 based on the way logs work.
+	// Pre-calc to save a calc in work
+	log2To10Factor = n / log2(10.0);
+	d_n = n;
+	d_vlen = vlen;
+	d_k=k;
 
-		// Precheck to save on floating comparison in work
-		if (d_k == 0.0)
-			kIsNotZero = false;
-		else
-			kIsNotZero = true;
-    }
+	// Precheck to save on floating comparison in work
+	if (d_k == 0.0)
+		kIsNotZero = false;
+	else
+		kIsNotZero = true;
+}
 
-    /*
-     * Our virtual destructor.
-     */
-    nlog10volk_impl::~nlog10volk_impl()
-    {
-    }
+/*
+ * Our virtual destructor.
+ */
+nlog10volk_impl::~nlog10volk_impl()
+{
+}
 
-    int
-    nlog10volk_impl::work_original(int noutput_items,
-        gr_vector_const_void_star &input_items,
-        gr_vector_void_star &output_items)
-    {
-        const float *in = (const float *) input_items[0];
-        float *out = (float *) output_items[0];
-        int noi = noutput_items * d_vlen;
-        float n = d_n;
-        float k = d_k;
+int
+nlog10volk_impl::work_original(int noutput_items,
+		gr_vector_const_void_star &input_items,
+		gr_vector_void_star &output_items)
+{
+	const float *in = (const float *) input_items[0];
+	float *out = (float *) output_items[0];
+	int noi = noutput_items * d_vlen;
+	float n = d_n;
+	float k = d_k;
 
-        for (int i = 0; i < noi; i++)
-        	out[i] = n * log10(std::max(in[i], (float) 1e-18)) + k;
+	for (int i = 0; i < noi; i++)
+		out[i] = n * log10(std::max(in[i], (float) 1e-18)) + k;
 
-        return noutput_items;
-    }
+	return noutput_items;
+}
 
-    int
-    nlog10volk_impl::work_test(int noutput_items,
-        gr_vector_const_void_star &input_items,
-        gr_vector_void_star &output_items)
-    {
-        const float *in = (const float *) input_items[0];
-        float *out = (float *) output_items[0];
-        int noi = noutput_items * d_vlen;
+int
+nlog10volk_impl::work_test(int noutput_items,
+		gr_vector_const_void_star &input_items,
+		gr_vector_void_star &output_items)
+{
+	const float *in = (const float *) input_items[0];
+	float *out = (float *) output_items[0];
+	int noi = noutput_items * d_vlen;
 
-		// Calc n*log10(x) as n*log2(x)/log2(10) = (n/log2(10)) * log2(x)
-        // Calc the log2 part
-		volk_32f_log2_32f(out,in,noi);
-		// Incorporate the scaling factor
-		volk_32f_s32f_multiply_32f(out,out,log2To10Factor,noi);
+	// Calc n*log10(x) as n*log2(x)/log2(10) = (n/log2(10)) * log2(x)
+        		// Calc the log2 part
+				volk_32f_log2_32f(out,in,noi);
+				// Incorporate the scaling factor
+				volk_32f_s32f_multiply_32f(out,out,log2To10Factor,noi);
 
-		// Add k only if it's not zero
-		if (kIsNotZero) {
-	        for (int i = 0; i < noi; i++)
-	        	out[i] = out[i] + d_k;
-		}
+				// Add k only if it's not zero
+				if (kIsNotZero) {
+					for (int i = 0; i < noi; i++)
+						out[i] = out[i] + d_k;
+				}
 
-      // Tell runtime system how many output items we produced.
-      return noutput_items;
-    }
+				// Tell runtime system how many output items we produced.
+				return noutput_items;
+}
 
-    int
-    nlog10volk_impl::work(int noutput_items,
-        gr_vector_const_void_star &input_items,
-        gr_vector_void_star &output_items)
-    {
-        const float *in = (const float *) input_items[0];
-        float *out = (float *) output_items[0];
-        int noi = noutput_items * d_vlen;
+int
+nlog10volk_impl::work(int noutput_items,
+		gr_vector_const_void_star &input_items,
+		gr_vector_void_star &output_items)
+{
+	const float *in = (const float *) input_items[0];
+	float *out = (float *) output_items[0];
+	int noi = noutput_items * d_vlen;
 
-		// Calc n*log10(x) as n*log2(x)/log2(10) = (n/log2(10)) * log2(x)
-        // Calc the log2 part
-		volk_32f_log2_32f(out,in,noi);
-		// Incorporate the scaling factor
-		volk_32f_s32f_multiply_32f(out,out,log2To10Factor,noi);
+	// Calc n*log10(x) as n*log2(x)/log2(10) = (n/log2(10)) * log2(x)
+	// Calc the log2 part
+	volk_32f_log2_32f(out,in,noi);
+	// Incorporate the scaling factor
+	volk_32f_s32f_multiply_32f(out,out,log2To10Factor,noi);
 
-		// Add k only if it's not zero
-		if (kIsNotZero) {
-	        for (int i = 0; i < noi; i++)
-	        	out[i] = out[i] + d_k;
-		}
+	// Add k only if it's not zero
+	if (kIsNotZero) {
+		for (int i = 0; i < noi; i++)
+			out[i] = out[i] + d_k;
+	}
 
-      // Tell runtime system how many output items we produced.
-      return noutput_items;
-    }
+	// Tell runtime system how many output items we produced.
+	return noutput_items;
+}
 
-  } /* namespace lfast */
+} /* namespace lfast */
 } /* namespace gr */
 

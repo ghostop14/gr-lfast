@@ -39,7 +39,7 @@ namespace gr {
 	  virtual public blocks::control_loop
     {
      public:
-      typedef boost::shared_ptr<costas4> sptr;
+      typedef std::shared_ptr<costas4> sptr;
 
       /*!
        * \brief Return a shared_ptr to a new instance of lfast::costas4.

@@ -675,155 +675,150 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <gnuradio/io_signature.h>
 #include "MTFIRFilterFF_impl.h"
 #include <volk/volk.h>
 
 namespace gr {
-  namespace lfast {
+namespace lfast {
 
-    MTFIRFilterFF::sptr
-    MTFIRFilterFF::make(int decimation, const std::vector<float> &taps, int nthreads)
-    {
-      return gnuradio::get_initial_sptr
-        (new MTFIRFilterFF_impl(decimation, taps, nthreads));
-    }
+MTFIRFilterFF::sptr
+MTFIRFilterFF::make(int decimation, const std::vector<float>& taps, int nthreads)
+{
+	return gnuradio::make_block_sptr<MTFIRFilterFF_impl>(decimation, taps, nthreads);
+}
 
-    /*
-     * The private constructor
-     */
-    MTFIRFilterFF_impl::MTFIRFilterFF_impl(int decimation, const std::vector<float> &taps, int nthreads)
-      : gr::sync_decimator("MTFIRFilterFF",
-              gr::io_signature::make(1, 1, sizeof(float)),
-              gr::io_signature::make(1, 1, sizeof(float)), decimation)
-    {
-        // d_fir = new gr::filter::kernel::fir_filter_fff(decimation, taps);
-    	d_fir_original = new gr::filter::kernel::fir_filter_fff(decimation, taps);
-        d_fir = new gr::lfast::FIRFilterFFF_MT(taps,nthreads);
+/*
+ * The private constructor
+ */
+MTFIRFilterFF_impl::MTFIRFilterFF_impl(int decimation, const std::vector<float> &taps, int nthreads)
+: gr::sync_decimator("MTFIRFilterFF",
+		gr::io_signature::make(1, 1, sizeof(float)),
+		gr::io_signature::make(1, 1, sizeof(float)), decimation)
+{
+	// d_fir = new gr::filter::kernel::fir_filter_fff(decimation, taps);
+	d_fir_original = new gr::filter::kernel::fir_filter_fff(taps);
+	d_fir = new gr::lfast::FIRFilterFFF_MT(taps,nthreads);
 
-        d_updated = false;
-        set_history(d_fir->ntaps());
+	d_updated = false;
+	set_history(d_fir->ntaps());
 
-        const int alignment_multiple =
-        volk_get_alignment() / sizeof(float);
-        set_alignment(std::max(1, alignment_multiple));
+	const int alignment_multiple =
+			volk_get_alignment() / sizeof(float);
+	set_alignment(std::max(1, alignment_multiple));
 
-        d_ndecimation = decimation;
-        // try to make sure we don't get like 20 samples:
-        /*
+	d_ndecimation = decimation;
+	// try to make sure we don't get like 20 samples:
+	/*
         int minMultiple = d_fir->ntaps()*nthreads;
 
         if (minMultiple % 2 != 0)
         	minMultiple += 1;
 
         gr::block::set_output_multiple(minMultiple);
-        */
-        gr::block::set_output_multiple(2048*nthreads);
+	 */
+	gr::block::set_output_multiple(2048*nthreads);
 
-    }
+}
 
-    /*
-     * Our virtual destructor.
-     */
-    MTFIRFilterFF_impl::~MTFIRFilterFF_impl()
-    {
-    	stop();
-    	delete d_fir;
-    	delete d_fir_original;
-    }
+/*
+ * Our virtual destructor.
+ */
+MTFIRFilterFF_impl::~MTFIRFilterFF_impl()
+{
+	stop();
+	delete d_fir;
+	delete d_fir_original;
+}
 
-    bool MTFIRFilterFF_impl::stop() {
-    	return true;
-    }
+bool MTFIRFilterFF_impl::stop() {
+	return true;
+}
 
-    void
-	MTFIRFilterFF_impl::set_taps(const std::vector<float> &taps)
-    {
-      gr::thread::scoped_lock l(d_setlock);
-      d_fir->set_taps(taps);
-      d_updated = true;
-    }
+void
+MTFIRFilterFF_impl::set_taps(const std::vector<float> &taps)
+{
+	gr::thread::scoped_lock l(d_setlock);
+	d_fir->set_taps(taps);
+	d_updated = true;
+}
 
-    std::vector<float>
-    MTFIRFilterFF_impl::taps() const
-    {
-      return d_fir->taps();
-    }
+std::vector<float>
+MTFIRFilterFF_impl::taps() const
+{
+	return d_fir->taps();
+}
 
-    int
-	MTFIRFilterFF_impl::work_original(int noutput_items,
-        gr_vector_const_void_star &input_items,
-        gr_vector_void_star &output_items)
-    {
-		gr::thread::scoped_lock l(d_setlock);
+int
+MTFIRFilterFF_impl::work_original(int noutput_items,
+		gr_vector_const_void_star &input_items,
+		gr_vector_void_star &output_items)
+{
+	gr::thread::scoped_lock l(d_setlock);
 
-		const float *in = (const float *) input_items[0];
-		float *out = (float *) output_items[0];
+	const float *in = (const float *) input_items[0];
+	float *out = (float *) output_items[0];
 
-		if (d_ndecimation == 1) {
-		  d_fir_original->filterN(out, in, noutput_items);
-		}
-		else {
-		  d_fir_original->filterNdec(out, in, noutput_items, d_ndecimation);
-		}
+	if (d_ndecimation == 1) {
+		d_fir_original->filterN(out, in, noutput_items);
+	}
+	else {
+		d_fir_original->filterNdec(out, in, noutput_items, d_ndecimation);
+	}
 
-		// Tell runtime system how many output items we produced.
-		return noutput_items;
-    }
+	// Tell runtime system how many output items we produced.
+	return noutput_items;
+}
 
-    int
-	MTFIRFilterFF_impl::work_test(int noutput_items,
-        gr_vector_const_void_star &input_items,
-        gr_vector_void_star &output_items)
-    {
-		gr::thread::scoped_lock l(d_setlock);
+int
+MTFIRFilterFF_impl::work_test(int noutput_items,
+		gr_vector_const_void_star &input_items,
+		gr_vector_void_star &output_items)
+{
+	gr::thread::scoped_lock l(d_setlock);
 
-		const float *in = (const float *) input_items[0];
-		float *out = (float *) output_items[0];
+	const float *in = (const float *) input_items[0];
+	float *out = (float *) output_items[0];
 
-		if (d_ndecimation == 1) {
-		  d_fir->filterN(out, in, noutput_items);
-		}
-		else {
-		  d_fir->filterNdec(out, in, noutput_items, d_ndecimation);
-		}
+	if (d_ndecimation == 1) {
+		d_fir->filterN(out, in, noutput_items);
+	}
+	else {
+		d_fir->filterNdec(out, in, noutput_items, d_ndecimation);
+	}
 
-		// Tell runtime system how many output items we produced.
-		return noutput_items;
-    }
+	// Tell runtime system how many output items we produced.
+	return noutput_items;
+}
 
 
-    int
-    MTFIRFilterFF_impl::work(int noutput_items,
-        gr_vector_const_void_star &input_items,
-        gr_vector_void_star &output_items)
-    {
-		gr::thread::scoped_lock l(d_setlock);
+int
+MTFIRFilterFF_impl::work(int noutput_items,
+		gr_vector_const_void_star &input_items,
+		gr_vector_void_star &output_items)
+{
+	gr::thread::scoped_lock l(d_setlock);
 
-		if (d_updated) {
-			set_history(d_fir->ntaps());
-			d_updated = false;
-			return 0;	     // history requirements may have changed.
-		}
+	if (d_updated) {
+		set_history(d_fir->ntaps());
+		d_updated = false;
+		return 0;	     // history requirements may have changed.
+	}
 
-		const float *in = (const float *) input_items[0];
-		float *out = (float *) output_items[0];
+	const float *in = (const float *) input_items[0];
+	float *out = (float *) output_items[0];
 
-		if (d_ndecimation == 1) {
-		  d_fir->filterN(out, in, noutput_items);
-		}
-		else {
-		  d_fir->filterNdec(out, in, noutput_items, d_ndecimation);
-		}
+	if (d_ndecimation == 1) {
+		d_fir->filterN(out, in, noutput_items);
+	}
+	else {
+		d_fir->filterNdec(out, in, noutput_items, d_ndecimation);
+	}
 
-		// Tell runtime system how many output items we produced.
-		return noutput_items;
-    }
+	// Tell runtime system how many output items we produced.
+	return noutput_items;
+}
 
-  } /* namespace lfast */
+} /* namespace lfast */
 } /* namespace gr */
 
