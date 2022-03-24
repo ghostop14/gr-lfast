@@ -81,7 +81,7 @@ costas2_impl::costas2_impl(float loop_bw, int order, bool genPDUs)
                       this, _1));
 	 */
 	message_port_register_in(pmt::mp("msgin"));
-	set_msg_handler(pmt::mp("msgin"), boost::bind(&costas2_impl::handleMsgIn, this, _1) );
+	set_msg_handler(pmt::mp("msgin"), boost::bind(&costas2_impl::handleMsgIn, this, boost::placeholders::_1) );
 
 	message_port_register_out(pmt::mp("msgout"));
 }
