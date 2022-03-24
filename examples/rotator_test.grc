@@ -181,7 +181,9 @@ blocks:
   parameters:
     alias: ''
     comment: ''
-    imports: import math
+    imports:
+        import math
+        from gnuradio.fft import window
   states:
     bus_sink: false
     bus_source: false

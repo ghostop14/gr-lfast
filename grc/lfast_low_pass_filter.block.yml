@@ -62,6 +62,7 @@ templates:
     imports: |-
         from gnuradio import filter
         from gnuradio.filter import firdes
+        from gnuradio.fft import window
     make: filter.fft_filter_${type}(${decim}, firdes.low_pass(${gain}, ${samp_rate},
         ${cutoff_freq}, ${width}, ${win}, ${beta}), ${nthreads})
     callbacks:
