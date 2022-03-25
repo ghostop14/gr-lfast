@@ -1,6 +1,7 @@
 options:
   parameters:
     author: ''
+    catch_exceptions: 'True'
     category: '[GRC Hier Blocks]'
     cmake_opt: ''
     comment: ''
@@ -97,6 +98,19 @@ blocks:
     coordinate: [352, 260]
     rotation: 0
     state: enabled
+- name: import_0
+  id: import
+  parameters:
+    alias: ''
+    comment: ''
+    imports: from gnuradio.fft import window
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [352, 112.0]
+    rotation: 0
+    state: true
 - name: lfast_MTFIRLowPassFilterXX_0
   id: lfast_MTFIRLowPassFilterXX
   parameters:
@@ -112,7 +126,7 @@ blocks:
     samp_rate: samp_rate
     type: CCF
     width: cutoff_freq*.2
-    win: firdes.WIN_HAMMING
+    win: window.WIN_HAMMING
   states:
     bus_sink: false
     bus_source: false
@@ -136,7 +150,7 @@ blocks:
     samp_rate: samp_rate
     type: fir_filter_ccf
     width: cutoff_freq*.2
-    win: firdes.WIN_HAMMING
+    win: window.WIN_HAMMING
   states:
     bus_sink: false
     bus_source: false
@@ -196,6 +210,7 @@ blocks:
     minoutbuf: '0'
     name: '"Filtered Signal"'
     nconnections: '3'
+    norm_window: 'False'
     showports: 'True'
     tr_chan: '0'
     tr_level: '0.0'
@@ -214,7 +229,7 @@ blocks:
     width7: '1'
     width8: '1'
     width9: '1'
-    wintype: firdes.WIN_BLACKMAN_hARRIS
+    wintype: window.WIN_BLACKMAN_hARRIS
     ymax: '10'
     ymin: '-140'
   states:
@@ -235,3 +250,4 @@ connections:
 
 metadata:
   file_format: 1
+  grc_version: v3.11.0.0git-70-gf44384ae

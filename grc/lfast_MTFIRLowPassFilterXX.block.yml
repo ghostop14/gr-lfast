@@ -35,10 +35,10 @@ parameters:
     dtype: real
 -   id: win
     label: Window
-    dtype: int
-    default: firdes.WIN_HAMMING
-    options: [firdes.WIN_HAMMING, firdes.WIN_HANN, firdes.WIN_BLACKMAN, firdes.WIN_RECTANGULAR,
-        firdes.WIN_KAISER]
+    dtype: enum
+    default: window.WIN_HAMMING
+    options: [window.WIN_HAMMING, window.WIN_HANN, window.WIN_BLACKMAN, window.WIN_RECTANGULAR,
+        window.WIN_KAISER]
     option_labels: [Hamming, Hann, Blackman, Rectangular, Kaiser]
 -   id: beta
     label: Beta
@@ -57,6 +57,7 @@ templates:
     imports: |-
         import lfast
         from gnuradio.filter import firdes
+        from gnuradio.fft import window
     make: lfast.MTFIRFilter${type}(1, firdes.low_pass(${gain}, ${samp_rate}, ${cutoff_freq},
         ${width}, ${win}, ${beta}), ${nthreads})
     callbacks:
